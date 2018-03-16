@@ -1,0 +1,12 @@
+api:
+      resource: '@YnloGraphQLBundle/Resources/config/routing/root.yml'
+      prefix:   /
+
+api_explore:
+      resource: '@YnloGraphQLBundle/Resources/config/routing/explorer.yml'
+      prefix:   /explorer
+
+media_service:
+      resource: '@MediaServiceBundle/Resources/config/routing.yml'
+      prefix:   /
+

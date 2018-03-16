@@ -1,0 +1,43 @@
+services:
+    Ynlo\GraphQLMediaService\MediaServer\FileManager:
+        class: Ynlo\GraphQLMediaService\MediaServer\FileManager
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool'
+            - '%media_service_config%'
+
+    Ynlo\GraphQLMediaService\MediaServer\LocalMediaStorageProvider:
+        class: Ynlo\GraphQLMediaService\MediaServer\LocalMediaStorageProvider
+        arguments: ['@router', '%secret%']
+        tags:
+          - { name: 'media_service.storage', alias: 'local' }
+
+    Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool:
+        class: Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool
+        arguments: ['%media_service_config%']
+
+    restful_platform.media_server.cache_warmer:
+        class: Ynlo\GraphQLMediaService\Cache\MediaServerCacheWarmer
+        arguments: ['@Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata']
+        public: false
+        tags:
+            - { name: 'kernel.cache_warmer', priority: 200 }
+            - { name: 'kernel.event_subscriber', priority: 200 }
+
+    Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata:
+        class: Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata
+        arguments: ['@doctrine','@annotations.reader','%kernel.cache_dir%']
+
+    Ynlo\GraphQLMediaService\EventListener\Doctrine\MediaServerListener:
+        class: Ynlo\GraphQLMediaService\EventListener\Doctrine\MediaServerListener
+        public: false
+        arguments:
+            - '@Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata'
+            - '@Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool'
+        tags:
+            - { name: 'doctrine.event_subscriber' }
+
+    Ynlo\GraphQLMediaService\Form\TypeGuesser\FileTypeGuesser:
+        arguments: ['@doctrine']
+        tags:
+            - { name: 'form.type_guesser'}

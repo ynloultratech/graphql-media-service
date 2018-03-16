@@ -1,0 +1,15 @@
+imports:
+    - { resource: config_dev.yml }
+
+framework:
+    test: ~
+    session:
+        storage_id: session.storage.mock_file
+    profiler:
+        collect: false
+
+graphql:
+    security:
+        validation_rules:
+            query_complexity: 303
+

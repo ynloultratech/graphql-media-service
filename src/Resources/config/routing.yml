@@ -1,0 +1,11 @@
+media_service_upload_file:
+    path: /upload
+    defaults:  { _controller: MediaServiceBundle:UploadFile:upload }
+    methods:
+      - POST
+
+media_service_get_file:
+    path: /{id}/{name}
+    defaults:  { _controller: MediaServiceBundle:GetFile:download }
+    methods:
+      - GET

@@ -1,0 +1,23 @@
+query GetFile($id: ID!){
+    node(id: $id){
+        id
+        ... on File {
+            contentType
+            name
+            size
+            createdAt
+            updatedAt
+            url
+        }
+    }
+}
+
+mutation SetProfilePhoto($id: ID!, $photoId: ID!){
+    updateProfile(input: {id: $id, photo: $photoId}){
+        node{
+            photo {
+                url
+            }
+        }
+    }
+}
