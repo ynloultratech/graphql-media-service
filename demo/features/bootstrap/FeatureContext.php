@@ -66,12 +66,14 @@ class FeatureContext extends ApiContext
      */
     public function compareUploadedFileWith($arg1, $arg2)
     {
-        $this->client->request('get', $arg1);
-        $response = $this->client->getResponse();
+        $arg1 = str_replace('http://localhost:8000', null, $arg1);
+        $client = clone $this->client;
+        $client->request('get', $arg1);
+        $response = $client->getResponse();
         if ($response instanceof \Symfony\Component\HttpFoundation\BinaryFileResponse) {
             $uploadedContent = file_get_contents($response->getFile()->getPathname());
         } else {
-            $uploadedContent = file_get_contents($arg1);
+            $uploadedContent = file_get_contents($this->getContainer()->getParameter('kernel.root_dir').'/../public'.$arg1);
         }
 
         $file = __DIR__.'/files/'.$arg2;
