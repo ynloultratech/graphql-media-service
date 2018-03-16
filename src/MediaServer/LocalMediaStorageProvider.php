@@ -13,6 +13,7 @@ namespace Ynlo\GraphQLMediaService\MediaServer;
 use Spatie\UrlSigner\MD5UrlSigner;
 use Spatie\UrlSigner\UrlSigner;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Router;
@@ -48,11 +49,9 @@ class LocalMediaStorageProvider extends AbstractMediaStorageProvider
     /**
      * {@inheritDoc}
      */
-    public function read(FileInterface $media)
+    public function get(FileInterface $media): \SplFileInfo
     {
-        $handle = fopen($this->getFileName($media), 'rb+');
-
-        return fread($handle, filesize($this->getFileName($media)));
+        return new \SplFileInfo($this->getFileName($media));
     }
 
     /**
@@ -86,19 +85,17 @@ class LocalMediaStorageProvider extends AbstractMediaStorageProvider
     /**
      * {@inheritDoc}
      */
-    public function save(FileInterface $media, string $content)
+    public function save(FileInterface $media, UploadedFile $file)
     {
         $fileSystem = new Filesystem();
         $fileSystem->mkdir($this->getDirName($media));
-        $handle = fopen($this->getFileName($media), 'wb+');
+        $file->move($this->getDirName($media), $media->getName());
+
         if ($this->config['private']) {
             $media->setStorageMeta(['salt' => md5(time().mt_rand())]);
         } else {
             $media->setStorageMeta([]);
         }
-
-        fwrite($handle, $content);
-        fclose($handle);
     }
 
     /**

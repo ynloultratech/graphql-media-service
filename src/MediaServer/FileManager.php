@@ -12,6 +12,7 @@ namespace Ynlo\GraphQLMediaService\MediaServer;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ynlo\GraphQLMediaService\Model\FileInterface;
 
 class FileManager
@@ -47,11 +48,11 @@ class FileManager
 
     /**
      * @param FileInterface $file
-     * @param string        $content file content to store the file phisically
+     * @param UploadedFile  $uploadedFile
      *
      * @throws \Exception
      */
-    public function saveFile(FileInterface $file, $content)
+    public function saveFile(FileInterface $file, UploadedFile $uploadedFile)
     {
         if (!$file->getStorage()) {
             throw new \LogicException('The file must have a valid storage name to save');
@@ -61,7 +62,7 @@ class FileManager
         $this->em->persist($file);
         $this->em->flush($file);
         try {
-            $this->getStorageProvider($file->getStorage())->save($file, $content);
+            $this->getStorageProvider($file->getStorage())->save($file, $uploadedFile);
             $this->em->flush($file);
             $this->em->commit();
         } catch (\Exception $exception) {
@@ -76,17 +77,17 @@ class FileManager
     /**
      * @param FileInterface $file
      *
-     * @return string
+     * @return \SplFileInfo
      *
      * @throws \Exception
      */
-    public function readFile(FileInterface $file)
+    public function getFile(FileInterface $file)
     {
         if (!$file->getStorage()) {
-            throw new \LogicException('The file must have a valid storage name to save');
+            throw new \LogicException('The file must have a valid storage name to read');
         }
 
-        return $this->getStorageProvider($file->getStorage())->read($file);
+        return $this->getStorageProvider($file->getStorage())->get($file);
     }
 
     /**
@@ -99,7 +100,7 @@ class FileManager
     public function removeFile(FileInterface $file)
     {
         if (!$file->getStorage()) {
-            throw new \LogicException('The file must have a valid storage name to save');
+            throw new \LogicException('The file must have a valid storage name to remove');
         }
 
         return $this->getStorageProvider($file->getStorage())->remove($file);

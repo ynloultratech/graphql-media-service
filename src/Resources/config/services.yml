@@ -1,4 +1,9 @@
 services:
+    Ynlo\GraphQLMediaService\Controller\UploadFileController:
+        class: Ynlo\GraphQLMediaService\Controller\UploadFileController
+        arguments:
+            - !tagged media_service.extension
+
     Ynlo\GraphQLMediaService\MediaServer\FileManager:
         class: Ynlo\GraphQLMediaService\MediaServer\FileManager
         arguments:

@@ -11,12 +11,14 @@
 namespace Ynlo\GraphQLMediaService\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Ynlo\GraphQLBundle\Definition\Registry\DefinitionRegistry;
 use Ynlo\GraphQLBundle\Model\ID;
+use Ynlo\GraphQLMediaService\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaService\MediaServer\FileManager;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
@@ -24,36 +26,57 @@ use Ynlo\GraphQLMediaService\Model\FileInterface;
 
 class UploadFileController extends Controller
 {
+    protected $extensions;
+
+    /**
+     * UploadFileController constructor.
+     *
+     * @param iterable $extensions
+     */
+    public function __construct(iterable $extensions = [])
+    {
+        $this->extensions = $extensions;
+    }
+
     public function uploadAction(Request $request)
     {
         $fm = $this->get(FileManager::class);
         $file = $fm->newFile();
 
-        $resource = $request->getContent(true);
+        $content = $request->getContent();
         $contentType = $request->headers->get('content-type');
         $contentLength = $request->headers->get('content-length');
         $name = $request->get('name', $file->getName());
 
-        if (!is_resource($resource)
+        if (!$content
             || !$contentType
             || !$contentLength
             || !$name
         ) {
             throw new BadRequestHttpException();
         }
-        $content = stream_get_contents($resource);
 
-        fclose($resource);
-        if (!$content) {
-            throw new BadRequestHttpException();
-        }
+        $tmpFile = tempnam(sys_get_temp_dir(), 'upload');
+        $handle = fopen($tmpFile, 'wb+');
+        fwrite($handle, $content);
+        fclose($handle);
 
         $file->setName($name);
         $file->setContentType($contentType);
         $file->setSize($contentLength);
         $file->setUpdatedAt(new \DateTime());
 
-        $fm->saveFile($file, $content);
+        $uploadedFile = new UploadedFile($tmpFile, $name, $contentType, null, null, true);
+
+        /** @var MediaServerExtensionInterface $extension */
+        foreach ($this->extensions as $extension) {
+            $alteredUploadedFile = $extension->preUpload($file, $uploadedFile);
+            if ($alteredUploadedFile) {
+                $uploadedFile = $alteredUploadedFile;
+            }
+        }
+
+        $fm->saveFile($file, $uploadedFile);
 
         $type = $this->container
             ->get(DefinitionRegistry::class)

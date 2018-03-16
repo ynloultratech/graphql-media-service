@@ -17,6 +17,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
@@ -102,10 +103,12 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
                         //move from default provider to configured provider
                         if ($config->storage && $newValue->getStorage() !== $config->storage) {
                             $oldProvider = $this->getProviderByStorageId($newValue->getStorage());
-                            $content = $oldProvider->read($newValue);
+                            $file = $oldProvider->get($newValue);
+
+                            $uploadedFile = new UploadedFile($file, $newValue->getName(), $newValue->getContentType(), null, null, true);
 
                             $newProvider = $this->getProviderByStorageId($config->storage);
-                            $newProvider->save($newValue, $content);
+                            $newProvider->save($newValue, $uploadedFile);
 
                             $newValue->setUrl($newProvider->getDownloadUrl($newValue));
                             $newValue->setStorage($config->storage);

@@ -10,6 +10,7 @@
 
 namespace Ynlo\GraphQLMediaService\MediaServer;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ynlo\GraphQLMediaService\Model\FileInterface;
 
 interface MediaStorageProviderInterface
@@ -28,11 +29,11 @@ interface MediaStorageProviderInterface
      *
      * @param FileInterface $media
      *
-     * @return string file content as string
+     * @return \SplFileInfo
      *
      * @throws \Exception on fail
      */
-    public function read(FileInterface $media);
+    public function get(FileInterface $media): \SplFileInfo;
 
     /**
      * Resolve the given media and get the url
@@ -43,11 +44,11 @@ interface MediaStorageProviderInterface
 
     /**
      * @param FileInterface $media
-     * @param string        $content resource content as string
+     * @param UploadedFile  $file
      *
      * @throws \Exception on fail
      */
-    public function save(FileInterface $media, string $content);
+    public function save(FileInterface $media, UploadedFile $file);
 
     /**
      * Delete the file related to the resource
