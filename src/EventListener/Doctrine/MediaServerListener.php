@@ -15,9 +15,11 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
+use League\Url\Url;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Ynlo\GraphQLMediaService\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
@@ -38,6 +40,11 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     protected $storageProviders;
 
     /**
+     * @var iterable
+     */
+    protected $extensions;
+
+    /**
      * @var [] save internal pending changes to avoid a loop and errors
      */
     private $queue;
@@ -54,11 +61,13 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
      *
      * @param MediaServerMetadata      $metadata
      * @param MediaStorageProviderPool $storageProviders
+     * @param iterable                 $extensions
      */
-    public function __construct(MediaServerMetadata $metadata, MediaStorageProviderPool $storageProviders)
+    public function __construct(MediaServerMetadata $metadata, MediaStorageProviderPool $storageProviders, iterable $extensions = [])
     {
         $this->metadata = $metadata;
         $this->storageProviders = $storageProviders;
+        $this->extensions = $extensions;
     }
 
     /**
@@ -79,7 +88,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
         $object = $event->getObject();
         if ($object instanceof FileInterface) {
             if ($provider = $this->getProviderByStorageId($object->getStorage())) {
-                $object->setUrl($provider->getDownloadUrl($object));
+                $object->setUrl($this->getDownloadUrl($provider, $object));
             }
         }
     }
@@ -96,11 +105,8 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
                 if ($this->metadata->isMappedProperty($class, $name)) {
                     $config = $this->metadata->getPropertyConfig($class, $name);
                     list(, $newValue) = $changeSet;
-
                     if ($newValue instanceof FileInterface) {
-                        $newValue->used();
-
-                        //move from default provider to configured provider
+                        //move from current provider to configured provider
                         if ($config->storage && $newValue->getStorage() !== $config->storage) {
                             $oldProvider = $this->getProviderByStorageId($newValue->getStorage());
                             $file = $oldProvider->get($newValue);
@@ -110,17 +116,40 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
                             $newProvider = $this->getProviderByStorageId($config->storage);
                             $newProvider->save($newValue, $uploadedFile);
 
-                            $newValue->setUrl($newProvider->getDownloadUrl($newValue));
                             $newValue->setStorage($config->storage);
+                            $newValue->setUrl($this->getDownloadUrl($newProvider, $newValue));
 
                             $oldProvider->remove($newValue);
                         }
 
+                        /** @var MediaServerExtensionInterface $extension */
+                        foreach ($this->extensions as $extension) {
+                            $provider = $this->getProviderByStorageId($newValue->getStorage());
+                            $extension->onUse($provider, $newValue, new \ReflectionProperty($class, $name));
+                        }
+
+                        $newValue->used();
                         $this->queue($newValue);
                     }
                 }
             }
         }
+    }
+
+    public function getDownloadUrl(MediaStorageProviderInterface $provider, FileInterface $file): string
+    {
+        $uri = $provider->getDownloadUrl($file);
+        $url = Url::createFromUrl($uri);
+
+        /** @var MediaServerExtensionInterface $extension */
+        foreach ($this->extensions as $extension) {
+            $newUrl = $extension->downloadUrl($provider, $file, $url);
+            if ($newUrl instanceof Url) {
+                $url = $newUrl;
+            }
+        }
+
+        return (string) $url;
     }
 
     /**

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Ynlo\GraphQLMediaService\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaService\MediaServer\LocalMediaStorageProvider;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
@@ -22,6 +23,18 @@ use Ynlo\GraphQLMediaService\Model\FileInterface;
 
 class GetFileController extends Controller
 {
+    protected $extensions;
+
+    /**
+     * UploadFileController constructor.
+     *
+     * @param iterable $extensions
+     */
+    public function __construct(iterable $extensions = [])
+    {
+        $this->extensions = $extensions;
+    }
+
     public function downloadAction(Request $request)
     {
         //api context is not possible here because its a action out of api
@@ -31,10 +44,20 @@ class GetFileController extends Controller
             $provider = $this->getStorageProvider($media->getStorage());
 
             if (($provider instanceof LocalMediaStorageProvider) && $provider->isValidSignedRequest($media, $request)) {
+                $fileToDownload = new File(
+                    $provider->getFileName($media)
+                );
+
+                /** @var MediaServerExtensionInterface $extension */
+                foreach ($this->extensions as $extension) {
+                    $newFileToDownload = $extension->preDownload($provider, $media, $request);
+                    if ($newFileToDownload) {
+                        $fileToDownload = $newFileToDownload;
+                    }
+                }
+
                 return new BinaryFileResponse(
-                    new File(
-                        $provider->getFileName($media)
-                    ),
+                    $fileToDownload,
                     200,
                     [
                         'Content-Type' => $media->getContentType(),

@@ -10,7 +10,10 @@
 
 namespace Ynlo\GraphQLMediaService\MediaServer\Extension;
 
+use League\Url\Url;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
+use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
 use Ynlo\GraphQLMediaService\Model\FileInterface;
 
 interface MediaServerExtensionInterface
@@ -18,20 +21,33 @@ interface MediaServerExtensionInterface
     /**
      * Can alter the file before save
      *
-     * @param FileInterface $file
-     * @param UploadedFile  $uploadedFile
+     * @param MediaStorageProviderInterface $storage
+     * @param FileInterface                 $file
+     * @param UploadedFile                  $uploadedFile
      *
      * @return UploadedFile|null can return customized uploaded file
      */
-    public function preUpload(FileInterface $file, UploadedFile $uploadedFile): void;
+    public function preUpload(MediaStorageProviderInterface $storage, FileInterface $file, UploadedFile $uploadedFile): void;
 
     /**
      * This action is triggered when a file is used/assigned to a specific entity/property
      *
-     * @param FileInterface       $file
-     * @param \ReflectionProperty $property
+     * @param MediaStorageProviderInterface $storage
+     * @param FileInterface                 $file
+     * @param \ReflectionProperty           $property
      */
-    public function onUse(FileInterface $file, \ReflectionProperty $property);
+    public function onUse(MediaStorageProviderInterface $storage, FileInterface $file, \ReflectionProperty $property);
+
+    /**
+     * Use to alter or add parameters to download url
+     *
+     * @param MediaStorageProviderInterface $storage
+     * @param FileInterface                 $file
+     * @param Url                           $url
+     *
+     * @return Url|null return new url instance to use as the url
+     */
+    public function downloadUrl(MediaStorageProviderInterface $storage, FileInterface $file, Url $url);
 
     /**
      * This action happen before a file is downloaded.
@@ -39,9 +55,11 @@ interface MediaServerExtensionInterface
      *
      * NOTE: public files does not trigger this action
      *
-     * @param FileInterface $file
+     * @param MediaStorageProviderInterface $storage
+     * @param FileInterface                 $file
+     * @param Request                       $request
      *
      * @return null|\SplFileInfo
      */
-    public function preDownload(FileInterface $file);
+    public function preDownload(MediaStorageProviderInterface $storage, FileInterface $file, Request $request);
 }

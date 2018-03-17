@@ -13,6 +13,7 @@ namespace Ynlo\GraphQLMediaService\MediaServer;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Ynlo\GraphQLMediaService\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaService\Model\FileInterface;
 
 class FileManager
@@ -33,39 +34,56 @@ class FileManager
     protected $config;
 
     /**
+     * @var iterable
+     */
+    protected $extensions;
+
+    /**
      * FileManager constructor.
      *
      * @param EntityManagerInterface   $em
      * @param MediaStorageProviderPool $providers
      * @param array                    $config
+     * @param iterable                 $extensions
      */
-    public function __construct(EntityManagerInterface $em, MediaStorageProviderPool $providers, array $config)
+    public function __construct(EntityManagerInterface $em, MediaStorageProviderPool $providers, array $config, iterable $extensions = [])
     {
         $this->em = $em;
         $this->providers = $providers;
         $this->config = $config;
+        $this->extensions = $extensions;
     }
 
     /**
+     * Upload given real file into file asset and link it
+     *
      * @param FileInterface $file
-     * @param UploadedFile  $uploadedFile
+     * @param \SplFileInfo  $realFile
      *
      * @throws \Exception
      */
-    public function saveFile(FileInterface $file, UploadedFile $uploadedFile)
+    public function upload(FileInterface $file, \SplFileInfo $realFile)
     {
-        if (!$file->getStorage()) {
-            throw new \LogicException('The file must have a valid storage name to save');
-        }
-
         $this->em->beginTransaction();
         $this->em->persist($file);
         $this->em->flush($file);
         try {
-            $this->getStorageProvider($file->getStorage())->save($file, $uploadedFile);
+            $provider = $this->getStorageProvider($file);
+            $uploadFile = new UploadedFile($realFile, $file->getName(), null, null, null, true);
+
+            /** @var MediaServerExtensionInterface $extension */
+            foreach ($this->extensions as $extension) {
+                $alteredUploadedFile = $extension->preUpload($provider, $file, $uploadFile);
+                if ($alteredUploadedFile) {
+                    $uploadFile = $alteredUploadedFile;
+                }
+            }
+
+            $provider->save($file, $uploadFile);
             $this->em->flush($file);
             $this->em->commit();
         } catch (\Exception $exception) {
+
             $this->em->rollback();
 
             throw $exception;
@@ -81,13 +99,9 @@ class FileManager
      *
      * @throws \Exception
      */
-    public function getFile(FileInterface $file)
+    public function get(FileInterface $file)
     {
-        if (!$file->getStorage()) {
-            throw new \LogicException('The file must have a valid storage name to read');
-        }
-
-        return $this->getStorageProvider($file->getStorage())->get($file);
+        return $this->getStorageProvider($file)->get($file);
     }
 
     /**
@@ -97,31 +111,26 @@ class FileManager
      *
      * @throws \Exception
      */
-    public function removeFile(FileInterface $file)
+    public function remove(FileInterface $file)
     {
-        if (!$file->getStorage()) {
-            throw new \LogicException('The file must have a valid storage name to remove');
-        }
-
-        return $this->getStorageProvider($file->getStorage())->remove($file);
+        return $this->getStorageProvider($file)->remove($file);
     }
 
     /**
-     * Create new file instance, must save using saveFile
+     * Create new empty file instance, must be persisted using `upload()`
      *
-     * @param string $filePath if a file path is given, then the name,
-     *                         size and type is automatically guessed
+     * @param string $pattern set a real file path to guess name, mime type, size etc.
      *
      * @return FileInterface
      */
-    public function newFile($filePath = null): FileInterface
+    public function createEmptyFile($pattern = null): FileInterface
     {
         $class = $this->getFileClass();
         /** @var FileInterface $instance */
         $instance = new $class();
 
-        if ($filePath) {
-            $file = new \SplFileInfo($filePath);
+        if ($pattern) {
+            $file = new \SplFileInfo($pattern);
             $instance->setName($file->getFilename());
             $instance->setSize($file->getSize());
             $instance->setContentType($file->getMTime());
@@ -130,6 +139,20 @@ class FileManager
         $instance->setStorage($this->getDefaultStorageId());
 
         return $instance;
+    }
+
+    /**
+     * @param FileInterface $file
+     *
+     * @return MediaStorageProviderInterface
+     */
+    public function getStorageProvider(FileInterface $file)
+    {
+        if (!$file->getStorage()) {
+            throw new \LogicException('The file must have a valid storage.');
+        }
+
+        return $this->providers->getByStorageId($file->getStorage());
     }
 
     /**
@@ -152,15 +175,5 @@ class FileManager
     protected function getDefaultStorageId()
     {
         return $this->config['default_storage'];
-    }
-
-    /**
-     * @param string $storageId
-     *
-     * @return MediaStorageProviderInterface
-     */
-    protected function getStorageProvider($storageId)
-    {
-        return $this->providers->getByStorageId($storageId);
     }
 }

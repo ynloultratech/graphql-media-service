@@ -11,14 +11,12 @@
 namespace Ynlo\GraphQLMediaService\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Ynlo\GraphQLBundle\Definition\Registry\DefinitionRegistry;
 use Ynlo\GraphQLBundle\Model\ID;
-use Ynlo\GraphQLMediaService\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaService\MediaServer\FileManager;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
 use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
@@ -26,22 +24,10 @@ use Ynlo\GraphQLMediaService\Model\FileInterface;
 
 class UploadFileController extends Controller
 {
-    protected $extensions;
-
-    /**
-     * UploadFileController constructor.
-     *
-     * @param iterable $extensions
-     */
-    public function __construct(iterable $extensions = [])
-    {
-        $this->extensions = $extensions;
-    }
-
     public function uploadAction(Request $request)
     {
         $fm = $this->get(FileManager::class);
-        $file = $fm->newFile();
+        $file = $fm->createEmptyFile();
 
         $content = $request->getContent();
         $contentType = $request->headers->get('content-type');
@@ -66,17 +52,7 @@ class UploadFileController extends Controller
         $file->setSize($contentLength);
         $file->setUpdatedAt(new \DateTime());
 
-        $uploadedFile = new UploadedFile($tmpFile, $name, $contentType, null, null, true);
-
-        /** @var MediaServerExtensionInterface $extension */
-        foreach ($this->extensions as $extension) {
-            $alteredUploadedFile = $extension->preUpload($file, $uploadedFile);
-            if ($alteredUploadedFile) {
-                $uploadedFile = $alteredUploadedFile;
-            }
-        }
-
-        $fm->saveFile($file, $uploadedFile);
+        $fm->upload($file, new \SplFileInfo($tmpFile));
 
         $type = $this->container
             ->get(DefinitionRegistry::class)

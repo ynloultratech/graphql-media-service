@@ -1,6 +1,9 @@
 services:
     Ynlo\GraphQLMediaService\Controller\UploadFileController:
         class: Ynlo\GraphQLMediaService\Controller\UploadFileController
+
+    Ynlo\GraphQLMediaService\Controller\GetFileController:
+        class: Ynlo\GraphQLMediaService\Controller\GetFileController
         arguments:
             - !tagged media_service.extension
 
@@ -10,6 +13,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool'
             - '%media_service_config%'
+            - !tagged media_service.extension
 
     Ynlo\GraphQLMediaService\MediaServer\LocalMediaStorageProvider:
         class: Ynlo\GraphQLMediaService\MediaServer\LocalMediaStorageProvider
@@ -39,6 +43,7 @@ services:
         arguments:
             - '@Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata'
             - '@Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool'
+            - !tagged media_service.extension
         tags:
             - { name: 'doctrine.event_subscriber' }
 

@@ -22,6 +22,12 @@ Feature: File
     When upload file "avatar.jpg"
     Then the response status code should be 201
     And grab "{response.data.id}" to use as "photoId"
+    And should exist in repository "AppBundle:File" a record matching:
+    """
+    name: avatar.jpg
+    status: NEW
+    storage: public_files
+    """
     And restart client
 
     Given the operation named "SetProfilePhoto"
@@ -34,4 +40,7 @@ Feature: File
     """
     name: avatar.jpg
     status: IN_USE
+    storage: private_files
     """
+
+    And remove file "{photoId}"

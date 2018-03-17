@@ -5,7 +5,7 @@ media_service_upload_file:
       - POST
 
 media_service_get_file:
-    path: /{id}/{name}
+    path: /file/{id}/{name}
     defaults:  { _controller: MediaServiceBundle:GetFile:download }
     methods:
       - GET
