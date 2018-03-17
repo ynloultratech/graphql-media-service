@@ -104,7 +104,7 @@ class Configuration implements ConfigurationInterface
                      ->info('Param to set the signature expiration timestamp');
 
         $localStorage->integerNode('signature_max_age')
-                     ->defaultValue(3600)
+                     ->defaultValue(86400) // 24 hours
                      ->min(1)
                      ->max(31536000) //year
                      ->info('Age in seconds of each signature');
