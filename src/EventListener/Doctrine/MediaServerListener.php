@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\EventListener\Doctrine;
+namespace Ynlo\GraphQLMediaServiceBundle\EventListener\Doctrine;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
@@ -19,11 +19,11 @@ use League\Url\Url;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Ynlo\GraphQLMediaService\MediaServer\Extension\MediaServerExtensionInterface;
-use Ynlo\GraphQLMediaService\MediaServer\MediaServerMetadata;
-use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
-use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
-use Ynlo\GraphQLMediaService\Model\FileInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension\MediaServerExtensionInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaServerMetadata;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool;
+use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
 class MediaServerListener implements EventSubscriber, ContainerAwareInterface
 {

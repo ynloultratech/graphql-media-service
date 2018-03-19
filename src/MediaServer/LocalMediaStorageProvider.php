@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\MediaServer;
+namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
 use Spatie\UrlSigner\MD5UrlSigner;
 use Spatie\UrlSigner\UrlSigner;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Router;
-use Ynlo\GraphQLMediaService\Model\FileInterface;
+use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
 /**
  * Provide storage capabilities to local files and fetch files using current server

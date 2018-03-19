@@ -26,8 +26,8 @@ class ApiDemoKernel extends Kernel
             new Fresh\DoctrineEnumBundle\FreshDoctrineEnumBundle(),
             new Ynlo\GraphQLBundle\YnloGraphQLBundle(),
 
-            new Ynlo\GraphQLMediaService\MediaServiceBundle(),
-            new Ynlo\GraphQLMediaService\Demo\AppBundle\AppBundle(),
+            new Ynlo\GraphQLMediaServiceBundle\MediaServiceBundle(),
+            new Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\AppBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {

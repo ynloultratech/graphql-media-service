@@ -51,7 +51,7 @@ twig:
     strict_variables: "%kernel.debug%"
 
 media_service:
-    class: Ynlo\GraphQLMediaService\Demo\AppBundle\Entity\File
+    class: Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File
     default_storage: public_files
     storage:
        public_files:

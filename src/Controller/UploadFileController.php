@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Controller;
+namespace Ynlo\GraphQLMediaServiceBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Ynlo\GraphQLBundle\Definition\Registry\DefinitionRegistry;
 use Ynlo\GraphQLBundle\Model\ID;
-use Ynlo\GraphQLMediaService\MediaServer\FileManager;
-use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
-use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
-use Ynlo\GraphQLMediaService\Model\FileInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\FileManager;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool;
+use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
 class UploadFileController extends Controller
 {

@@ -8,13 +8,13 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Demo\AppBundle\Entity;
+namespace Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Ynlo\GraphQLBundle\Annotation as GraphQL;
 use Ynlo\GraphQLBundle\Model\NodeInterface;
-use Ynlo\GraphQLMediaService\Annotation as MediaService;
+use Ynlo\GraphQLMediaServiceBundle\Annotation as MediaService;
 
 /**
  * @ORM\Entity()
@@ -56,7 +56,7 @@ class Profile implements NodeInterface
     /**
      * @var File
      *
-     * @ORM\OneToOne(targetEntity="Ynlo\GraphQLMediaService\Demo\AppBundle\Entity\File", orphanRemoval=true, cascade={"all"})
+     * @ORM\OneToOne(targetEntity="Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File", orphanRemoval=true, cascade={"all"})
      *
      * @GraphQL\Expose()
      *

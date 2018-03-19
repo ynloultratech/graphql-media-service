@@ -9,7 +9,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\DependencyInjection;
+namespace Ynlo\GraphQLMediaServiceBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;

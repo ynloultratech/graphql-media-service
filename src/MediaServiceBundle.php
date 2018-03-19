@@ -8,11 +8,11 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService;
+namespace Ynlo\GraphQLMediaServiceBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Ynlo\GraphQLMediaService\DependencyInjection\Compiler\MediaStorageCompiler;
+use Ynlo\GraphQLMediaServiceBundle\DependencyInjection\Compiler\MediaStorageCompiler;
 
 class MediaServiceBundle extends Bundle
 {

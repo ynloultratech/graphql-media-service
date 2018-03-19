@@ -10,7 +10,7 @@
 
 use Ynlo\GraphQLBundle\Behat\Context\ApiContext;
 use Ynlo\GraphQLBundle\Model\ID;
-use Ynlo\GraphQLMediaService\Demo\AppBundle\Entity\File;
+use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File;
 
 /**
  * Defines application features from the specific context.

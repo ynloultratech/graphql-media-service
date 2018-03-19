@@ -13,7 +13,7 @@ namespace Ynlo\GraphQLBundle\Demo\AppBundle\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Faker\Factory;
-use Ynlo\GraphQLMediaService\Demo\AppBundle\Entity\Profile;
+use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\Profile;
 
 /**
  * Class FixtureManager

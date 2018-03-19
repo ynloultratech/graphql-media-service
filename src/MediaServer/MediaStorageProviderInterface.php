@@ -8,10 +8,10 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\MediaServer;
+namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Ynlo\GraphQLMediaService\Model\FileInterface;
+use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
 interface MediaStorageProviderInterface
 {

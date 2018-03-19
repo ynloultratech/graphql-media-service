@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Model;
+namespace Ynlo\GraphQLMediaServiceBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;

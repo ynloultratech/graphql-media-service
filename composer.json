@@ -16,12 +16,12 @@
   ],
   "autoload": {
     "psr-4": {
-      "Ynlo\\GraphQLMediaService\\": "src/"
+      "Ynlo\\GraphQLMediaServiceBundle\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Ynlo\\GraphQLMediaService\\Demo\\": "demo/src/"
+      "Ynlo\\GraphQLMediaServiceBundle\\Demo\\": "demo/src/"
     },
     "classmap": [
       "demo/app/ApiDemoKernel.php"

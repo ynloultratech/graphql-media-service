@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Exception;
+namespace Ynlo\GraphQLMediaServiceBundle\Exception;
 
 class StorageConfigException extends \Exception
 {

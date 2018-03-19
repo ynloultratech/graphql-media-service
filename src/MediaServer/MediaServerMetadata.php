@@ -8,13 +8,13 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\MediaServer;
+namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Ynlo\GraphQLMediaService\Annotation\AttachFile;
-use Ynlo\GraphQLMediaService\Model\FileInterface;
+use Ynlo\GraphQLMediaServiceBundle\Annotation\AttachFile;
+use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
 /**
  * Manager to know wish entities and properties are mapped

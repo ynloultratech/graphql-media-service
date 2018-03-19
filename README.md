@@ -25,6 +25,8 @@ $bundles = [
 ];    
 ````
 
+## How its works?
+
 ## Usage
 
 > The following steps assume you have a configured GraphQLAPI using 

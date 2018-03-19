@@ -8,11 +8,11 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Demo\AppBundle\Entity;
+namespace Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Ynlo\GraphQLBundle\Annotation as GraphQL;
-use Ynlo\GraphQLMediaService\Model\AbstractFile;
+use Ynlo\GraphQLMediaServiceBundle\Model\AbstractFile;
 
 /**
  * @ORM\Entity()

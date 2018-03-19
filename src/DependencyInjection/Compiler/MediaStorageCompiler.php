@@ -8,12 +8,12 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\DependencyInjection\Compiler;
+namespace Ynlo\GraphQLMediaServiceBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool;
 
 class MediaStorageCompiler implements CompilerPassInterface
 {

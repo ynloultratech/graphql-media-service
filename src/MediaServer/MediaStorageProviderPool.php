@@ -8,9 +8,9 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\MediaServer;
+namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
-use Ynlo\GraphQLMediaService\DependencyInjection\Configuration;
+use Ynlo\GraphQLMediaServiceBundle\DependencyInjection\Configuration;
 
 class MediaStorageProviderPool
 {

@@ -8,12 +8,12 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Demo\AppBundle\Form\Input\Profile;
+namespace Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Form\Input\Profile;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Ynlo\GraphQLMediaService\Demo\AppBundle\Entity\Profile;
+use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\Profile;
 
 class UpdateProfileInput extends AbstractType
 {

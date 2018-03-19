@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\MediaServer;
+namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
 abstract class AbstractMediaStorageProvider implements MediaStorageProviderInterface
 {

@@ -8,18 +8,18 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Controller;
+namespace Ynlo\GraphQLMediaServiceBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Ynlo\GraphQLMediaService\MediaServer\Extension\MediaServerExtensionInterface;
-use Ynlo\GraphQLMediaService\MediaServer\LocalMediaStorageProvider;
-use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderInterface;
-use Ynlo\GraphQLMediaService\MediaServer\MediaStorageProviderPool;
-use Ynlo\GraphQLMediaService\Model\FileInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension\MediaServerExtensionInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\LocalMediaStorageProvider;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderInterface;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool;
+use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
 class GetFileController extends Controller
 {

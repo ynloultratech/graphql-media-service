@@ -8,7 +8,7 @@
  *  file that was distributed with this source code.
  */
 
-namespace Ynlo\GraphQLMediaService\Demo\AppBundle;
+namespace Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
