@@ -25,7 +25,7 @@ services:
         class: Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool
         arguments: ['%media_service_config%']
 
-    restful_platform.media_server.cache_warmer:
+    Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer:
         class: Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer
         arguments: ['@Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaServerMetadata']
         public: false
