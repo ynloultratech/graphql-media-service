@@ -1,7 +1,4 @@
 services:
-    Ynlo\GraphQLMediaServiceBundle\Controller\UploadFileController:
-        class: Ynlo\GraphQLMediaServiceBundle\Controller\UploadFileController
-
     Ynlo\GraphQLMediaServiceBundle\Controller\GetFileController:
         class: Ynlo\GraphQLMediaServiceBundle\Controller\GetFileController
         arguments:
