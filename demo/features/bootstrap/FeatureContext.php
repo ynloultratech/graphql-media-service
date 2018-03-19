@@ -8,6 +8,7 @@
  *  file that was distributed with this source code.
  */
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ynlo\GraphQLBundle\Behat\Context\ApiContext;
 use Ynlo\GraphQLBundle\Model\ID;
 use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File;
@@ -22,27 +23,30 @@ class FeatureContext extends ApiContext
      */
     public function uploadFile($arg1)
     {
-        $file = __DIR__.'/files/'.$arg1;
+        $query = <<<'GraphQL'
+mutation ($file: Upload!) { 
+    uploadFile(file: $file) {
+        id 
+    } 
+} 
+GraphQL;
+
+        $operations = ['query' => $query, 'variables' => ['file' => null]];
+
+        $tmp = tempnam(sys_get_temp_dir(), 'upload');
+        copy(__DIR__.'/files/'.$arg1, $tmp);
+
+        $file = new UploadedFile($tmp, $arg1, null, null, null, true);
         $this->client->request(
             'post',
-            '/upload',
-            ['name' => $arg1],
-            [],
+            '/',
             [
-                'CONTENT_TYPE' => 'text/plain',
-                'HTTP_CONTENT_LENGTH' => filesize($file),
+                'operations' => json_encode($operations),
+                'map' => json_encode(['0' => ['variables.file']]),
             ],
-            file_get_contents($file)
+            [$file],
+            ['CONTENT_TYPE' => 'multipart/form-data']
         );
-    }
-
-    /**
-     * @Given /^restart client$/
-     */
-    public function restartClient()
-    {
-        // required to fetch query after upload
-        $this->client->restart();
     }
 
     /**

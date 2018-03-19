@@ -71,50 +71,10 @@ class File extends AbstractFile
 }
 ````
 
-Add the routing config in your `routing.yml`
+At this point you must have a mutation called `uploadFile` in your graphql schema, 
+see [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec)
+for details of using multipart form data to upload files.
 
-````yaml
-#...
-media_service:
-      resource: '@MediaServiceBundle/Resources/config/routing.yml'
-      prefix:   /
-````
-> The routing is required to allow upload files using `/upload` action and fetch private
-resources using signed urls. Can override or use your own config if you want.
-
-Now yo can upload files using something like:
-
-    curl -X POST -d 'hello' -H 'content-length: 5' -H 'content-type: text/plain' your_domain.com/upload
-
-On success the server response with the id of the file:
-
-````json
-{
-  "data": {
-    "id": "RmlsZTpEMTdFODE5Ri0yM0I0LTQ2NkQtOTI3Qy03QjUwQTMxQ0I2QkY="
-  }
-}
-````
-
-Now can use the GraphQL API to get access to that file:
-
-````graphql
-query{
-  node(id: "RmlsZTpEMTdFODE5Ri0yM0I0LTQ2NkQtOTI3Qy03QjUwQTMxQ0I2QkY="){
-    id
-    ... on File{
-      name
-      contentType
-      size
-      createdAt
-      updatedAt
-      url
-    }
-  }
-}
-````
-
-At this point the media service is ready and can have access to upload files using the GraphQL API.
 
 ### Assign uploaded files to existent object
 

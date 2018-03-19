@@ -10,6 +10,11 @@
 
 namespace Ynlo\GraphQLMediaServiceBundle\Model;
 
+use Ynlo\GraphQLBundle\Annotation as GraphQL;
+
+/**
+ * @GraphQL\InterfaceType(name="AbstractFile")
+ */
 interface FileInterface
 {
     const STATUS_NEW = 'NEW';
@@ -18,12 +23,18 @@ interface FileInterface
     /**
      * Unique identifier for resource
      *
+     * @GraphQL\Field(type="ID!")
+     * @GraphQL\Expose()
+     *
      * @return mixed
      */
     public function getId();
 
     /**
      * Name of the file
+     *
+     * @GraphQL\Field(type="string!")
+     * @GraphQL\Expose()
      *
      * @return string
      */
@@ -39,6 +50,9 @@ interface FileInterface
     /**
      * MimeType of the resource
      *
+     * @GraphQL\Field(type="string!")
+     * @GraphQL\Expose()
+     *
      * @return string
      */
     public function getContentType();
@@ -52,6 +66,9 @@ interface FileInterface
 
     /**
      * Size of the resource in bytes
+     *
+     * @GraphQL\Field(type="integer!")
+     * @GraphQL\Expose()
      *
      * @return string
      */
@@ -67,6 +84,9 @@ interface FileInterface
     /**
      * Url to access to the resource
      *
+     * @GraphQL\Field(type="string")
+     * @GraphQL\Expose()
+     *
      * @return string
      */
     public function getUrl();
@@ -79,6 +99,9 @@ interface FileInterface
     public function setUrl($url);
 
     /**
+     * @GraphQL\Field(type="datetime!")
+     * @GraphQL\Expose()
+     *
      * @return \DateTime
      */
     public function getCreatedAt();
@@ -89,6 +112,9 @@ interface FileInterface
     public function setCreatedAt(\DateTime $updated);
 
     /**
+     * @GraphQL\Field(type="datetime")
+     * @GraphQL\Expose()
+     *
      * @return \DateTime
      */
     public function getUpdatedAt();

@@ -12,7 +12,9 @@ namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
@@ -55,41 +57,65 @@ class FileManager
     }
 
     /**
-     * Upload given real file into file asset and link it
+     * Upload given system file and create new file record or update given
      *
-     * @param FileInterface $file
-     * @param \SplFileInfo  $realFile
+     * @param \SplFileInfo|UploadedFile $systemFile
+     * @param FileInterface             $recordFile
+     *
+     * @return FileInterface
      *
      * @throws \Exception
      */
-    public function upload(FileInterface $file, \SplFileInfo $realFile)
+    public function upload(\SplFileInfo $systemFile, FileInterface $recordFile = null)
     {
         $this->em->beginTransaction();
-        $this->em->persist($file);
-        $this->em->flush($file);
+
+        if (null === $recordFile) {
+            $recordFile = $this->newFile();
+        }
+
+        $recordFile->setSize($systemFile->getSize());
+        if ($systemFile instanceof File) {
+            $recordFile->setContentType($systemFile->getMimeType());
+        } else {
+            $guesser = MimeTypeGuesser::getInstance();
+            $type =  $guesser->guess($systemFile->getPathname());
+            $recordFile->setContentType($type);
+        }
+
+        if (!$this->em->contains($recordFile)) {
+            $this->em->persist($recordFile);
+        }
+
+        $this->em->flush($recordFile);
         try {
-            $provider = $this->getStorageProvider($file);
-            $uploadFile = new UploadedFile($realFile, $file->getName(), null, null, null, true);
+            $provider = $this->getStorageProvider($recordFile);
+            if ($systemFile instanceof UploadedFile) {
+                $uploadFile = $systemFile;
+            } else {
+                $uploadFile = new UploadedFile($systemFile, $recordFile->getName(), null, null, null, true);
+            }
 
             /** @var MediaServerExtensionInterface $extension */
             foreach ($this->extensions as $extension) {
-                $alteredUploadedFile = $extension->preUpload($provider, $file, $uploadFile);
+                $alteredUploadedFile = $extension->preUpload($provider, $recordFile, $uploadFile);
                 if ($alteredUploadedFile) {
                     $uploadFile = $alteredUploadedFile;
                 }
             }
 
-            $provider->save($file, $uploadFile);
-            $this->em->flush($file);
+            $provider->save($recordFile, $uploadFile);
+            $this->em->flush($recordFile);
             $this->em->commit();
         } catch (\Exception $exception) {
-
             $this->em->rollback();
 
             throw $exception;
         }
 
-        $this->em->refresh($file);
+        $this->em->refresh($recordFile);
+
+        return $recordFile;
     }
 
     /**
@@ -119,22 +145,13 @@ class FileManager
     /**
      * Create new empty file instance, must be persisted using `upload()`
      *
-     * @param string $pattern set a real file path to guess name, mime type, size etc.
-     *
      * @return FileInterface
      */
-    public function createEmptyFile($pattern = null): FileInterface
+    public function newFile(): FileInterface
     {
         $class = $this->getFileClass();
         /** @var FileInterface $instance */
         $instance = new $class();
-
-        if ($pattern) {
-            $file = new \SplFileInfo($pattern);
-            $instance->setName($file->getFilename());
-            $instance->setSize($file->getSize());
-            $instance->setContentType($file->getMTime());
-        }
 
         $instance->setStorage($this->getDefaultStorageId());
 
