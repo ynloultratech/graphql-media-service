@@ -44,6 +44,7 @@ class MediaServerMetadata
 
     /**
      * @param Registry $doctrine
+     * @param Reader   $reader
      * @param string   $cacheDir
      */
     public function __construct(Registry $doctrine, Reader $reader, $cacheDir)
@@ -147,8 +148,6 @@ class MediaServerMetadata
         }
         $this->saveCache();
     }
-
-
 
     /**
      * @return string
