@@ -21,4 +21,13 @@ class AttachFile
      * @var string
      */
     public $storage;
+
+    /**
+     * Name of the file to generate without extension
+     * e.g. "logo", "profile", "invoice" etc.
+     * Otherwise a random name will be generated
+     *
+     * @var string
+     */
+    public $name;
 }

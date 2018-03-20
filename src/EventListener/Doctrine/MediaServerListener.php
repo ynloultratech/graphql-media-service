@@ -195,6 +195,14 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
 
                 $uploadedFile = new UploadedFile($systemFile, $file->getName(), $file->getContentType(), null, null, true);
 
+                if ($config->name) {
+                    $ext = null;
+                    if (preg_match('/\.\w+$/', $file->getName(), $matches)) {
+                        $ext = $matches[0];
+                    }
+                    $file->setName(sprintf('%s%s', $config->name, $ext));
+                }
+
                 $newProvider = $this->getProviderByStorageId($config->storage);
                 $newProvider->save($file, $uploadedFile);
 
