@@ -12,6 +12,7 @@ namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File;
@@ -77,10 +78,18 @@ class FileManager
         $recordFile->setSize($systemFile->getSize());
         if ($systemFile instanceof File) {
             $recordFile->setContentType($systemFile->getMimeType());
+            $extension = $systemFile->getExtension();
         } else {
             $guesser = MimeTypeGuesser::getInstance();
             $type =  $guesser->guess($systemFile->getPathname());
             $recordFile->setContentType($type);
+            $extension = ExtensionGuesser::getInstance()->guess($type);
+        }
+
+        // set extension if the name does not have none
+        if ($extension && !preg_match('/\.\w+$/', $recordFile->getName())) {
+            $extension = preg_replace('/^\./', null, $extension);
+            $recordFile->setName(sprintf('%s.%s', $recordFile->getName(), $extension));
         }
 
         if (!$this->em->contains($recordFile)) {
