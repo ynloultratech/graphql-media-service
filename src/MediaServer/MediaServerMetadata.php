@@ -65,6 +65,16 @@ class MediaServerMetadata
 
     /**
      * @param string $class
+     *
+     * @return array
+     */
+    public function getMappedProperties($class)
+    {
+        return array_keys($this->getManagedEntities()[$class]);
+    }
+
+    /**
+     * @param string $class
      * @param string $property
      *
      * @return bool

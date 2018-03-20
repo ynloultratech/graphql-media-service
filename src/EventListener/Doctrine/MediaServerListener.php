@@ -19,6 +19,7 @@ use League\Url\Url;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaServerMetadata;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderInterface;
@@ -77,6 +78,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     {
         return [
             Events::postLoad => 'postLoad',
+            Events::prePersist => 'prePersist',
             Events::preUpdate => 'preUpdate',
             Events::preRemove => 'preRemove',
             Events::postFlush => 'postFlush',
@@ -103,34 +105,29 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
         if ($this->metadata->isMappedClass($class)) {
             foreach ($event->getEntityChangeSet() as $name => $changeSet) {
                 if ($this->metadata->isMappedProperty($class, $name)) {
-                    $config = $this->metadata->getPropertyConfig($class, $name);
                     list(, $newValue) = $changeSet;
                     if ($newValue instanceof FileInterface) {
-                        //move from current provider to configured provider
-                        if ($config->storage && $newValue->getStorage() !== $config->storage) {
-                            $oldProvider = $this->getProviderByStorageId($newValue->getStorage());
-                            $file = $oldProvider->get($newValue);
-
-                            $uploadedFile = new UploadedFile($file, $newValue->getName(), $newValue->getContentType(), null, null, true);
-
-                            $newProvider = $this->getProviderByStorageId($config->storage);
-                            $newProvider->save($newValue, $uploadedFile);
-
-                            $newValue->setStorage($config->storage);
-                            $newValue->setUrl($this->getDownloadUrl($newProvider, $newValue));
-
-                            $oldProvider->remove($newValue);
-                        }
-
-                        /** @var MediaServerExtensionInterface $extension */
-                        foreach ($this->extensions as $extension) {
-                            $provider = $this->getProviderByStorageId($newValue->getStorage());
-                            $extension->onUse($provider, $newValue, new \ReflectionProperty($class, $name));
-                        }
-
-                        $newValue->used();
-                        $this->queue($newValue);
+                        $this->attachFileToEntity($newValue, $class, $name);
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param LifecycleEventArgs $event
+     */
+    public function prePersist(LifecycleEventArgs $event)
+    {
+        $object = $event->getObject();
+        $class = get_class($object);
+        if ($this->metadata->isMappedClass($class)) {
+            $props = $this->metadata->getMappedProperties($class);
+            $accessor = new PropertyAccessor();
+            foreach ($props as $prop) {
+                $value = $accessor->getValue($object, $prop);
+                if ($value instanceof FileInterface) {
+                    $this->attachFileToEntity($value, $class, $prop);
                 }
             }
         }
@@ -182,6 +179,40 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
                 $em->flush($object);
                 $this->flushing = false;
             }
+        }
+    }
+
+    protected function attachFileToEntity(FileInterface $file, $entityClass, $propertyName)
+    {
+        if ($file->isNew()) {
+            $config = $this->metadata->getPropertyConfig($entityClass, $propertyName);
+
+            // because a file is uploaded before attach to entity the current provider is the default provider
+            // when is attached the file must be moved to the entity configured provided
+            if ($config->storage && $file->getStorage() !== $config->storage) {
+                $oldProvider = $this->getProviderByStorageId($file->getStorage());
+                $systemFile = $oldProvider->get($file);
+
+                $uploadedFile = new UploadedFile($systemFile, $file->getName(), $file->getContentType(), null, null, true);
+
+                $newProvider = $this->getProviderByStorageId($config->storage);
+                $newProvider->save($file, $uploadedFile);
+
+                $file->setStorage($config->storage);
+                $file->setUrl($this->getDownloadUrl($newProvider, $file));
+
+                // remove in old provider
+                $oldProvider->remove($file);
+            }
+
+            /** @var MediaServerExtensionInterface $extension */
+            foreach ($this->extensions as $extension) {
+                $provider = $this->getProviderByStorageId($file->getStorage());
+                $extension->onUse($provider, $file, new \ReflectionProperty($entityClass, $propertyName));
+            }
+
+            $file->used();
+            $this->queue($file);
         }
     }
 
