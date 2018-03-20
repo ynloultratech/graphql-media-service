@@ -36,7 +36,7 @@
     "myclabs/deep-copy": "^1.7",
     "mindplay/readable": "^1.1",
     "mtdowling/jmespath.php": "^2.4",
-    "ynloultratech/graphql-bundle": "^1.0.2",
+    "ynloultratech/graphql-bundle": "^1.0.3",
     "spatie/url-signer": "^1.0"
   },
   "require-dev": {
