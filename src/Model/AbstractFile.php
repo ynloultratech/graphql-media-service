@@ -118,7 +118,7 @@ abstract class AbstractFile implements
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
-        $this->name = md5(uniqid(md5(time()), true));
+        $this->name = substr(md5(uniqid(md5(time()), true)), 0, 12);
     }
 
     /**
