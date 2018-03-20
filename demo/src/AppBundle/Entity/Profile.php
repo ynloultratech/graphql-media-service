@@ -23,6 +23,7 @@ use Ynlo\GraphQLMediaServiceBundle\Annotation as MediaService;
  * @GraphQL\ObjectType()
  *
  * @GraphQL\QueryList()
+ * @GraphQL\MutationAdd()
  * @GraphQL\MutationUpdate()
  */
 class Profile implements NodeInterface
@@ -56,11 +57,11 @@ class Profile implements NodeInterface
     /**
      * @var File
      *
-     * @ORM\OneToOne(targetEntity="Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File", orphanRemoval=true, cascade={"all"})
+     * @ORM\OneToOne(targetEntity="Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File", orphanRemoval=true)
      *
      * @GraphQL\Expose()
      *
-     * @MediaService\AttachFile(storage="private_files")
+     * @MediaService\AttachFile(storage="private_files", name="photo")
      */
     protected $photo;
 

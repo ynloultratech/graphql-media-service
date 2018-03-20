@@ -12,12 +12,3 @@ query GetFile($id: ID!){
     }
 }
 
-mutation SetProfilePhoto($id: ID!, $photoId: ID!){
-    updateProfile(input: {id: $id, photo: $photoId}){
-        node{
-            photo {
-                url
-            }
-        }
-    }
-}

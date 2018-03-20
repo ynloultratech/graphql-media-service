@@ -27,6 +27,7 @@ class FeatureContext extends ApiContext
 mutation ($file: Upload!) { 
     uploadFile(file: $file) {
         id 
+        name
     } 
 } 
 GraphQL;
