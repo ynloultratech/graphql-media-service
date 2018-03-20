@@ -1,6 +1,10 @@
 services:
+    # makes public all services by default
+    _defaults: { public: true }
+
     Ynlo\GraphQLMediaServiceBundle\Controller\GetFileController:
         class: Ynlo\GraphQLMediaServiceBundle\Controller\GetFileController
+        public: false
         arguments:
             - !tagged media_service.extension
 
@@ -46,6 +50,7 @@ services:
 
     Ynlo\GraphQLMediaServiceBundle\Form\TypeGuesser\FileTypeGuesser:
         arguments: ['@doctrine']
+        public: false
         tags:
             - { name: 'form.type_guesser'}
 
