@@ -70,7 +70,7 @@ interface FileInterface
      * @GraphQL\Field(type="integer!")
      * @GraphQL\Expose()
      *
-     * @return string
+     * @return int
      */
     public function getSize();
 

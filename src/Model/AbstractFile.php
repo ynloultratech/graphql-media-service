@@ -62,7 +62,7 @@ abstract class AbstractFile implements
      *
      * @var int
      *
-     * @ORM\Column(name="size", type="string", nullable=false)
+     * @ORM\Column(name="size", type="integer", nullable=false)
      */
     protected $size = 0;
 
@@ -170,7 +170,7 @@ abstract class AbstractFile implements
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getSize()
     {
@@ -178,7 +178,7 @@ abstract class AbstractFile implements
     }
 
     /**
-     * @param integer $size
+     * @param int $size
      */
     public function setSize($size): AbstractFile
     {
