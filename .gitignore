@@ -5,3 +5,4 @@
 /demo/public/uploads/
 /demo/uploads/
 demo.db
+composer.lock
