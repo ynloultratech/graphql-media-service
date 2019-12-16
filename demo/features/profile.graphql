@@ -1,18 +1,22 @@
 mutation AddProfileWithPhoto($name: String!, $email: String!, $photoId: ID!){
-    addProfile(input: {photo: $photoId, email: $email, name: $name}){
-        node{
-            photo {
-                url
+    profiles{
+        add(input: {photo: $photoId, email: $email, name: $name}){
+            node{
+                photo {
+                    url
+                }
             }
         }
     }
 }
 
 mutation SetProfilePhoto($id: ID!, $photoId: ID!){
-    updateProfile(input: {id: $id, photo: $photoId}){
-        node{
-            photo {
-                url
+    profiles{
+        update(input: {id: $id, photo: $photoId}){
+            node{
+                photo {
+                    url
+                }
             }
         }
     }

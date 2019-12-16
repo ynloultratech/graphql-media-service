@@ -1,0 +1,39 @@
+graphql:
+    graphiql:
+        default_query: |
+          # Type queries into this side of the screen, and you will
+          # see intelligent typeaheads aware of the current GraphQL type schema,
+          # live syntax, and validation errors highlighted within the text.
+
+          # We'll get you started with a simple query showing some profiles with images
+          {
+            profiles {
+              all(first: 10) {
+                edges {
+                  node {
+                    id
+                    name
+                    email
+                    photo {
+                      id
+                      name
+                      contentType
+                      size
+                      createdAt
+                      updatedAt
+                      url
+                    }
+                    license {
+                       id
+                       name
+                       contentType
+                       size
+                       createdAt
+                       updatedAt
+                       url
+                     }
+                  }
+                }
+              }
+            }
+          }

@@ -1,0 +1,73 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^7.1.3",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "doctrine/doctrine-fixtures-bundle": "^3.3",
+        "fzaninotto/faker": "^1.9",
+        "symfony/asset": "^4.4.0",
+        "symfony/console": "^4.4.0",
+        "symfony/dotenv": "^4.4.0",
+        "symfony/flex": "^1.3.1",
+        "symfony/framework-bundle": "^4.4.0",
+        "symfony/monolog-bundle": "^3.5",
+        "symfony/web-server-bundle": "^4.4.0",
+        "symfony/yaml": "^4.4.0",
+        "wikimedia/composer-merge-plugin": "^1.4.0",
+        "ynloultratech/graphql-bundle": "dev-master#a8d83540"
+    },
+    "require-dev": {
+        "behat/behat": "^3.4",
+        "behat/symfony2-extension": "^2.1",
+        "phpunit/phpunit": "^8.5",
+        "symfony/browser-kit": "4.4.*",
+        "symfony/test-pack": "^1.0"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "GraphQLMediaServiceDemo\\App\\": "src/"
+        }
+    },
+    "replace": {
+        "paragonie/random_compat": "2.*",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php71": "*",
+        "symfony/polyfill-php70": "*",
+        "symfony/polyfill-php56": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "4.4.*"
+        },
+        "merge-plugin": {
+            "require": [
+                "../composer.json"
+            ]
+        }
+    }
+}

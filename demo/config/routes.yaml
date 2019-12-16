@@ -1,0 +1,13 @@
+api:
+  resource: '@YnloGraphQLBundle/Resources/config/routing/root.yml'
+  prefix:   /api
+  trailing_slash_on_root: false
+
+api_explorer:
+  resource: '@YnloGraphQLBundle/Resources/config/routing/explorer.yml'
+  prefix:   /
+  trailing_slash_on_root: false
+
+media_service:
+  resource: '@MediaServiceBundle/Resources/config/routing.yml'
+  prefix:   /

@@ -15,9 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Ynlo\GraphQLBundle\Annotation as GraphQL;
 use Ynlo\GraphQLBundle\Model\NodeInterface;
 
-abstract class AbstractFile implements
-    FileInterface,
-    NodeInterface
+abstract class AbstractFile implements FileInterface, NodeInterface
 {
     /**
      * @var string

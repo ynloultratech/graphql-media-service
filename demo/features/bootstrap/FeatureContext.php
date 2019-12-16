@@ -11,7 +11,6 @@
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Ynlo\GraphQLBundle\Behat\Context\ApiContext;
 use Ynlo\GraphQLBundle\Model\ID;
-use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File;
 
 /**
  * Defines application features from the specific context.
@@ -40,7 +39,7 @@ GraphQL;
         $file = new UploadedFile($tmp, $arg1, null, null, null, true);
         $this->client->request(
             'post',
-            '/',
+            '/api',
             [
                 'operations' => json_encode($operations),
                 'map' => json_encode(['0' => ['variables.file']]),
@@ -55,12 +54,9 @@ GraphQL;
      */
     public function removeFile($arg1)
     {
-        $id = ID::createFromString($arg1)->getDatabaseId();
+        $file = \Ynlo\GraphQLBundle\Util\IDEncoder::decode($arg1);
         /** @var \Doctrine\ORM\EntityManagerInterface $em */
         $em = $this->getDoctrine()->getManager();
-
-        /** @var  File $file */
-        $file = $em->getReference(File::class, $id);
 
         $em->remove($file);
         $em->flush();

@@ -68,6 +68,11 @@ class MediaStorageProviderPool
         return null;
     }
 
+    public function getDefaultStorage(): MediaStorageProviderInterface
+    {
+        return $this->getByStorageId($this->config['default_storage']);
+    }
+
     /**
      * @param string $alias provider alias
      *

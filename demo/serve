@@ -6,11 +6,14 @@ path=$(pwd)
 
 echo Preparing...
 
-./console cache:clear --env=dev --no-warmup -q
-./console cache:warmup --env=dev -q
-./console doctrine:schema:drop --force --full-database -q
-./console doctrine:schema:create -q
-./console doctrine:schema:update  --force -q
-./console doctrine:fixtures:load -n -q
-./console assets:install public --symlink
-./console server:run --docroot=public
+rm -rf public/uploads
+rm -rf uploads
+
+bin/console cache:clear --env=dev --no-warmup -q
+bin/console cache:warmup --env=dev -q
+bin/console doctrine:schema:drop --force --full-database -q
+bin/console doctrine:schema:create -q
+bin/console doctrine:schema:update  --force -q
+bin/console doctrine:fixtures:load -n -q
+bin/console assets:install public --symlink
+bin/console server:run --docroot=public

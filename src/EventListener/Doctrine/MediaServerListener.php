@@ -105,7 +105,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
         if ($this->metadata->isMappedClass($class)) {
             foreach ($event->getEntityChangeSet() as $name => $changeSet) {
                 if ($this->metadata->isMappedProperty($class, $name)) {
-                    list(, $newValue) = $changeSet;
+                    [, $newValue] = $changeSet;
                     if ($newValue instanceof FileInterface) {
                         $this->attachFileToEntity($newValue, $class, $name);
                     }
@@ -187,29 +187,34 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
         if ($file->isNew()) {
             $config = $this->metadata->getPropertyConfig($entityClass, $propertyName);
 
-            // because a file is uploaded before attach to entity the current provider is the default provider
-            // when is attached the file must be moved to the entity configured provided
-            if ($config->storage && $file->getStorage() !== $config->storage) {
-                $oldProvider = $this->getProviderByStorageId($file->getStorage());
-                $systemFile = $oldProvider->get($file);
+            // When a new file is linked to entity some information will be updated for example
+            // sometimes the storage used to upload the file is not the same of the entity one
+            // and the file will be moved, renamed etc
 
-                $uploadedFile = new UploadedFile($systemFile, $file->getName(), $file->getContentType(), null, null, true);
+            $oldProviderName = $file->getStorage();
+            $oldProvider = $this->getProviderByStorageId($oldProviderName);
+            $systemFile = $oldProvider->get($file);
+            $uploadedFile = new UploadedFile($systemFile, $file->getName(), $file->getContentType(), null, null, true);
 
-                if ($config->name) {
-                    $ext = null;
-                    if (preg_match('/\.\w+$/', $file->getName(), $matches)) {
-                        $ext = $matches[0];
-                    }
-                    $file->setName(sprintf('%s%s', $config->name, $ext));
+            if ($config->name) {
+                $ext = null;
+                if (preg_match('/\.\w+$/', $file->getName(), $matches)) {
+                    $ext = $matches[0];
                 }
+                $file->setName(sprintf('%s%s', $config->name, $ext));
+            }
 
-                $newProvider = $this->getProviderByStorageId($config->storage);
-                $newProvider->save($file, $uploadedFile);
+            $newProvider = $this->getProviderByStorageId($config->storage);
+            $newProvider->save($file, $uploadedFile);
 
+            $file->setUrl($this->getDownloadUrl($newProvider, $file));
+
+            if ($config->storage && $config->storage !== $oldProviderName) {
                 $file->setStorage($config->storage);
-                $file->setUrl($this->getDownloadUrl($newProvider, $file));
+            }
 
-                // remove in old provider
+            // remove in old provider if the provider is different
+            if ($oldProviderName !== $file->getStorage()) {
                 $oldProvider->remove($file);
             }
 
@@ -225,15 +230,18 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     }
 
     /**
-     * @param string $id
+     * @param string|null $id
      *
      * @return MediaStorageProviderInterface
      */
-    protected function getProviderByStorageId($id)
+    protected function getProviderByStorageId($id): MediaStorageProviderInterface
     {
+        if (!$id) {
+            return $this->storageProviders->getDefaultStorage();
+        }
+
         return $this->storageProviders->getByStorageId($id);
     }
-
     /**
      * @param object $object
      */

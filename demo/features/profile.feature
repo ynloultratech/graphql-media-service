@@ -5,7 +5,7 @@ Feature: Profile
     Then the response is OK
     And grab "{response.data.uploadFile.id}" to use as "photoId"
     And grab "{response.data.uploadFile.name}" to use as "fileName"
-    And should exist in repository "AppBundle:File" a record matching:
+    And should exist in repository "App:File" a record matching:
     """
     name: '{fileName}'
     status: NEW
@@ -16,22 +16,21 @@ Feature: Profile
     And variable "email" is "{faker.email}"
     And variable "photoId" is "{photoId}"
     When send
-    And "{response.data.addProfile.node.photo.url}" should not be null
-    And compare uploaded file "{response.data.addProfile.node.photo.url}" with "avatar.jpg"
-    And should exist in repository "AppBundle:File" a record matching:
+    And "{response.data.profiles.add.node.photo.url}" should not be null
+    And compare uploaded file "{response.data.profiles.add.node.photo.url}" with "avatar.jpg"
+    And should exist in repository "App:File" a record matching:
     """
     name: 'photo.jpeg'
     status: IN_USE
-    storage: private_files
+    storage: public_files
     """
-    And remove file "{photoId}"
 
   Scenario: Set photo to existent profile
     When upload file "avatar.jpg"
     Then the response is OK
     And grab "{response.data.uploadFile.id}" to use as "photoId"
     And grab "{response.data.uploadFile.name}" to use as "fileName"
-    And should exist in repository "AppBundle:File" a record matching:
+    And should exist in repository "App:File" a record matching:
     """
     name: '{fileName}'
     status: NEW
@@ -41,12 +40,12 @@ Feature: Profile
     And variable "id" is "#profile1"
     And variable "photoId" is "{photoId}"
     When send
-    And "{response.data.updateProfile.node.photo.url}" should not be null
-    And compare uploaded file "{response.data.updateProfile.node.photo.url}" with "avatar.jpg"
-    And should exist in repository "AppBundle:File" a record matching:
+    And "{response.data.profiles.update.node.photo.url}" should not be null
+    And compare uploaded file "{response.data.profiles.update.node.photo.url}" with "avatar.jpg"
+    And should exist in repository "App:File" a record matching:
     """
     name: 'photo.jpeg'
     status: IN_USE
-    storage: private_files
+    storage: public_files
     """
     And remove file "{photoId}"

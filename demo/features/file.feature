@@ -5,13 +5,12 @@ Feature: File
     Then the response is OK
     And grab "{response.data.uploadFile.id}" to use as "fileId"
     And grab "{response.data.uploadFile.name}" to use as "fileName"
-    Then should exist in repository "AppBundle:File" a record matching:
+    Then should exist in repository "App:File" a record matching:
     """
     name: '{fileName}'
     status: NEW
     storage: public_files
     """
-
     Given the operation named "GetFile"
     And variable "id" is "{fileId}"
     When send

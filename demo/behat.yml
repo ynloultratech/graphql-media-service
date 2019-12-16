@@ -1,6 +1,0 @@
-default:
-    extensions:
-        Ynlo\GraphQLBundle\Behat\GraphQLApiExtension: ~
-        Behat\Symfony2Extension:
-            kernel:
-              class: ApiDemoKernel

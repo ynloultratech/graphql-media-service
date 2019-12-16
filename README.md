@@ -14,16 +14,6 @@ just the way you like it: fast and efficiently.
 Install using composer:
 
     composer require graphql-media-service
-    
-Add in your kernel:
-
-````php
-$bundles = [
-    ...
-    new Ynlo\GraphQLMediaService\MediaServiceBundle(),
-    new AppBundle\AppBundle(),
-];    
-````
 
 ## How its works?
 

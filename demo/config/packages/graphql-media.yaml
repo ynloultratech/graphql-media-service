@@ -1,0 +1,13 @@
+media_service:
+  class: GraphQLMediaServiceDemo\App\Entity\File
+  default_storage: public_files
+  storage:
+    public_files:
+      local:
+        dir_name: "%kernel.root_dir%/../public/uploads"
+        base_url: 'http://localhost:8000/uploads'
+    private_files:
+      local:
+        private: true
+        dir_name: "%kernel.root_dir%/../uploads"
+
