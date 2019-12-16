@@ -3,6 +3,8 @@
 /.env.local.php
 /.env.*.local
 /public/bundles/
+/public/uploads/
+/uploads/
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
@@ -22,3 +24,4 @@ demo.db
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
