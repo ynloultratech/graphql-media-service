@@ -1,0 +1,10 @@
+default:
+  extensions:
+    Ynlo\GraphQLBundle\Behat\GraphQLApiExtension:
+      route: api_root
+
+    Behat\Symfony2Extension:
+      kernel:
+        bootstrap: config/bootstrap.php
+        path: src/Kernel.php
+        class: GraphQLMediaServiceDemo\App\Kernel
