@@ -12,6 +12,7 @@ namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension\MediaServerExtensionInterface;
@@ -71,6 +72,10 @@ class FileManager
 
         if (null === $recordFile) {
             $recordFile = $this->newFile();
+        }
+
+        if (!$systemFile->getPathname()) {
+            throw new UploadException('File can`t be upload, check PHP mas upload size and folder permissions');
         }
 
         $recordFile->setSize($systemFile->getSize());
