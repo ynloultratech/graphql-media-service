@@ -101,7 +101,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     public function preUpdate(PreUpdateEventArgs $event)
     {
         $object = $event->getObject();
-        $class = get_class($object);
+        $class = $event->getEntityManager()->getClassMetadata(get_class($object))->name;
         if ($this->metadata->isMappedClass($class)) {
             foreach ($event->getEntityChangeSet() as $name => $changeSet) {
                 if ($this->metadata->isMappedProperty($class, $name)) {
@@ -120,7 +120,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     public function prePersist(LifecycleEventArgs $event)
     {
         $object = $event->getObject();
-        $class = get_class($object);
+        $class = $event->getEntityManager()->getClassMetadata(get_class($object))->name;
         if ($this->metadata->isMappedClass($class)) {
             $props = $this->metadata->getMappedProperties($class);
             $accessor = new PropertyAccessor();
