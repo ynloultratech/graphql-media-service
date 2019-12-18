@@ -15,7 +15,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Ynlo\GraphQLMediaServiceBundle\Demo\AppBundle\Entity\File;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension\MediaServerExtensionInterface;
 use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
@@ -76,7 +75,7 @@ class FileManager
         }
 
         $recordFile->setSize($systemFile->getSize());
-        if ($systemFile instanceof File) {
+        if ($systemFile instanceof FileInterface) {
             $recordFile->setContentType($systemFile->getMimeType());
             $extension = $systemFile->getExtension();
         } else {
