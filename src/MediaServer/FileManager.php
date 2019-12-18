@@ -75,7 +75,7 @@ class FileManager
         }
 
         if (!$systemFile->getPathname()) {
-            throw new UploadException('File can`t be upload, check PHP mas upload size and folder permissions');
+            throw new UploadException('File can\'t be uploaded, check PHP `upload_max_filesize` directive and/or folder permissions.');
         }
 
         $recordFile->setSize($systemFile->getSize());
