@@ -27,7 +27,7 @@
     "doctrine/common": "^2.8",
     "ynloultratech/graphql-bundle": "^1.4",
     "spatie/url-signer": "^1.0",
-    "symfony/mime": "^5.0"
+    "symfony/mime": "^3.4 || ^4.4"
   },
   "extra": {
     "branch-alias": {
