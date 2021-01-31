@@ -32,7 +32,6 @@ services:
         public: false
         tags:
             - { name: 'kernel.cache_warmer', priority: 200 }
-            - { name: 'kernel.event_subscriber', priority: 200 }
 
     Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaServerMetadata:
         class: Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaServerMetadata
