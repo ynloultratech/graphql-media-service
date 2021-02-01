@@ -25,7 +25,7 @@
     "symfony/framework-bundle": "^4.4 || ^5.0",
     "doctrine/annotations": "^1.5",
     "doctrine/common": "^3.0",
-    "ynloultratech/graphql-bundle": "^2.0",
+    "ynloultratech/graphql-bundle": "dev-master",
     "spatie/url-signer": "^1.0",
     "symfony/mime": "^4.4 || ^5.0"
   },

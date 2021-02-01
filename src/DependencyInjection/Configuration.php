@@ -28,12 +28,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
+        $treeBuilder = new TreeBuilder('graphql_media_service');
+        $rootNode = $treeBuilder->getRootNode()->addDefaultsIfNotSet()->children();
 
-        /** @var NodeBuilder $rootNode */
-        $rootNode = $treeBuilder->root('media_service')
-                                ->addDefaultsIfNotSet()
-                                ->children();
         $rootNode
             ->scalarNode('class')
             ->info('Entity class to persist and get media files relations')
