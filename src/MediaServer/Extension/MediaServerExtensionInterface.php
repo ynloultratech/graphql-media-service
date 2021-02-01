@@ -10,7 +10,7 @@
 
 namespace Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension;
 
-use League\Url\Url;
+use League\Uri\Uri;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderInterface;
@@ -43,11 +43,11 @@ interface MediaServerExtensionInterface
      *
      * @param MediaStorageProviderInterface $storage
      * @param FileInterface                 $file
-     * @param Url                           $url
+     * @param Uri                           $url
      *
-     * @return Url|null return new url instance to use as the url
+     * @return Uri|null return new url instance to use as the url
      */
-    public function downloadUrl(MediaStorageProviderInterface $storage, FileInterface $file, Url $url);
+    public function downloadUrl(MediaStorageProviderInterface $storage, FileInterface $file, Uri $url);
 
     /**
      * This action happen before a file is downloaded.

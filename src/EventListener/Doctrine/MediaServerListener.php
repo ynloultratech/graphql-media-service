@@ -15,7 +15,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use League\Url\Url;
+use League\Uri\Uri;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -136,12 +136,12 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     public function getDownloadUrl(MediaStorageProviderInterface $provider, FileInterface $file): string
     {
         $uri = $provider->getDownloadUrl($file);
-        $url = Url::createFromUrl($uri);
+        $url = Uri::createFromUri($uri);
 
         /** @var MediaServerExtensionInterface $extension */
         foreach ($this->extensions as $extension) {
             $newUrl = $extension->downloadUrl($provider, $file, $url);
-            if ($newUrl instanceof Url) {
+            if ($newUrl instanceof Uri) {
                 $url = $newUrl;
             }
         }

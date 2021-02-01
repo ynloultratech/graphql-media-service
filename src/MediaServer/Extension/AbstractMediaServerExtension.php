@@ -10,7 +10,7 @@
 
 namespace Ynlo\GraphQLMediaServiceBundle\MediaServer\Extension;
 
-use League\Url\Url;
+use League\Uri\Uri;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderInterface;
@@ -28,7 +28,7 @@ abstract class AbstractMediaServerExtension implements MediaServerExtensionInter
         // TODO: Implement onUse() method.
     }
 
-    public function downloadUrl(MediaStorageProviderInterface $storage, FileInterface $file, Url $url)
+    public function downloadUrl(MediaStorageProviderInterface $storage, FileInterface $file, Uri $url)
     {
         // TODO: Implement downloadUrl() method.
     }
