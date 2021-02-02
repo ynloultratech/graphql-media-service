@@ -136,7 +136,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     public function getDownloadUrl(MediaStorageProviderInterface $provider, FileInterface $file): string
     {
         $uri = $provider->getDownloadUrl($file);
-        $url = Uri::createFromUri($uri);
+        $url = Uri::createFromString($uri);
 
         /** @var MediaServerExtensionInterface $extension */
         foreach ($this->extensions as $extension) {
