@@ -14,9 +14,12 @@ namespace Ynlo\GraphQLMediaServiceBundle\DependencyInjection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer;
 use Ynlo\GraphQLMediaServiceBundle\Exception\StorageConfigException;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\LocalMediaStorageProvider;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\StorageServiceGateway;
 
 class MediaServiceExtension extends Extension
 {
@@ -36,6 +39,25 @@ class MediaServiceExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator($configDir));
         $loader->load('services.yml');
 
+        foreach ($config['storage'] as $name => $storage) {
+            $providerName = array_keys($storage)[0];
+            switch ($providerName) {
+                case Configuration::STORAGE_LOCAL:
+                    $service = LocalMediaStorageProvider::class;
+                    break;
+                default:
+                    $service = $storage[$providerName]['service'];
+            }
+            $options = $storage[$providerName]['options'] ?? [];
+
+            $container->register(sprintf('graphql.storage_service_gateway.%s', $name), StorageServiceGateway::class)
+                      ->addArgument($name)
+                      ->addArgument(new Reference($service))
+                      ->addArgument($options)
+                      ->addArgument($name === $config['default_storage'])
+                      ->addTag('media_service.storage_service_gateway');
+        }
+
         //in production does not clear cache using request events
         if (!$container->getParameter('kernel.debug')) {
             $container->getDefinition(MediaServerCacheWarmer::class)->clearTag('kernel.event_subscriber');
@@ -47,15 +69,6 @@ class MediaServiceExtension extends Extension
         foreach ($config['storage'] as $name => $storage) {
             if (count($storage) > 1) {
                 throw new StorageConfigException($name, 'Set only one provider for each storage.');
-            }
-            $storage = current($storage);
-
-            if (!@$storage['dir_name']) {
-                throw new StorageConfigException($name, '"dir_name" is required.');
-            }
-
-            if (!$storage['private'] && !@$storage['base_url']) {
-                throw new StorageConfigException($name, '"base_url" is required for public resources.');
             }
         }
     }

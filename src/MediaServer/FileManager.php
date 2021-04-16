@@ -28,7 +28,7 @@ class FileManager
     /**
      * @var MediaStorageProviderPool
      */
-    protected $providers;
+    protected $providerPool;
 
     /**
      * @var array
@@ -44,14 +44,14 @@ class FileManager
      * FileManager constructor.
      *
      * @param EntityManagerInterface   $em
-     * @param MediaStorageProviderPool $providers
+     * @param MediaStorageProviderPool $providerPool
      * @param array                    $config
      * @param iterable                 $extensions
      */
-    public function __construct(EntityManagerInterface $em, MediaStorageProviderPool $providers, array $config, iterable $extensions = [])
+    public function __construct(EntityManagerInterface $em, MediaStorageProviderPool $providerPool, array $config, iterable $extensions = [])
     {
         $this->em = $em;
-        $this->providers = $providers;
+        $this->providerPool = $providerPool;
         $this->config = $config;
         $this->extensions = $extensions;
     }
@@ -181,7 +181,7 @@ class FileManager
             throw new \LogicException('The file must have a valid storage.');
         }
 
-        return $this->providers->getByStorageId($file->getStorage());
+        return $this->providerPool->get($file->getStorage());
     }
 
     /**

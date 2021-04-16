@@ -10,17 +10,9 @@
 
 namespace Ynlo\GraphQLMediaServiceBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Ynlo\GraphQLMediaServiceBundle\DependencyInjection\Compiler\MediaStorageCompiler;
 
 class MediaServiceBundle extends Bundle
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        $container->addCompilerPass(new MediaStorageCompiler());
-    }
+
 }

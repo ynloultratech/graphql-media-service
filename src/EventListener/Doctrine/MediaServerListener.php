@@ -15,6 +15,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
+use GraphQL\Error\Error;
 use League\Uri\Uri;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -38,7 +39,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     /**
      * @var MediaStorageProviderPool
      */
-    protected $storageProviders;
+    protected $providerPool;
 
     /**
      * @var iterable
@@ -61,14 +62,14 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
      * MediaServerListener constructor.
      *
      * @param MediaServerMetadata      $metadata
-     * @param MediaStorageProviderPool $storageProviders
+     * @param MediaStorageProviderPool $providerPool
      * @param iterable                 $extensions
      */
-    public function __construct(MediaServerMetadata $metadata, MediaStorageProviderPool $storageProviders, iterable $extensions = [])
+    public function __construct(MediaServerMetadata $metadata, MediaStorageProviderPool $providerPool, iterable $extensions = [])
     {
         $this->metadata = $metadata;
-        $this->storageProviders = $storageProviders;
         $this->extensions = $extensions;
+        $this->providerPool = $providerPool;
     }
 
     /**
@@ -89,7 +90,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     {
         $object = $event->getObject();
         if ($object instanceof FileInterface) {
-            if ($provider = $this->getProviderByStorageId($object->getStorage())) {
+            if ($provider = $this->providerPool->get($object->getStorage())) {
                 $object->setUrl($this->getDownloadUrl($provider, $object));
             }
         }
@@ -156,7 +157,7 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
     {
         $object = $event->getObject();
         if ($object instanceof FileInterface) {
-            if ($provider = $this->getProviderByStorageId($object->getStorage())) {
+            if ($provider = $this->providerPool->get($object->getStorage())) {
                 $provider->remove($object);
             }
         }
@@ -191,9 +192,9 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
             // sometimes the storage used to upload the file is not the same of the entity one
             // and the file will be moved, renamed etc
 
-            $oldProviderName = $file->getStorage();
-            $oldProvider = $this->getProviderByStorageId($oldProviderName);
-            $systemFile = $oldProvider->get($file);
+            $oldFile = clone $file;
+            $systemFile = $this->providerPool->get($oldFile->getStorage())->get($file);
+
             $uploadedFile = new UploadedFile($systemFile, $file->getName(), $file->getContentType(), null, true);
 
             if ($config->name) {
@@ -204,23 +205,22 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
                 $file->setName(sprintf('%s%s', $config->name, $ext));
             }
 
-            $newProvider = $this->getProviderByStorageId($config->storage);
-            $newProvider->save($file, $uploadedFile);
+            $this->providerPool->get($config->storage)->save($file, $uploadedFile);
 
-            $file->setUrl($this->getDownloadUrl($newProvider, $file));
+            $file->setUrl($this->getDownloadUrl($this->providerPool->get($config->storage), $file));
 
-            if ($config->storage && $config->storage !== $oldProviderName) {
+            if ($config->storage && $config->storage !== $oldFile->getStorage()) {
                 $file->setStorage($config->storage);
             }
 
-            // remove in old provider if the provider is different
-            if ($oldProviderName !== $file->getStorage()) {
-                $oldProvider->remove($file);
+            // remove in old provider if the provider is different or the name change
+            if ($oldFile->getStorage() !== $file->getStorage() || $file->getName() !== $oldFile->getName()) {
+                $this->providerPool->get($oldFile->getStorage())->remove($oldFile);
             }
 
             /** @var MediaServerExtensionInterface $extension */
             foreach ($this->extensions as $extension) {
-                $provider = $this->getProviderByStorageId($file->getStorage());
+                $provider = $this->providerPool->get($file->getStorage());
                 $extension->onUse($provider, $file, new \ReflectionProperty($entityClass, $propertyName));
             }
 
@@ -229,19 +229,6 @@ class MediaServerListener implements EventSubscriber, ContainerAwareInterface
         }
     }
 
-    /**
-     * @param string|null $id
-     *
-     * @return MediaStorageProviderInterface
-     */
-    protected function getProviderByStorageId($id): MediaStorageProviderInterface
-    {
-        if (!$id) {
-            return $this->storageProviders->getDefaultStorage();
-        }
-
-        return $this->storageProviders->getByStorageId($id);
-    }
     /**
      * @param object $object
      */

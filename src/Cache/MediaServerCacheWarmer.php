@@ -20,7 +20,6 @@ class MediaServerCacheWarmer extends CacheWarmer
      */
     protected $metadata;
 
-
     public function __construct(MediaServerMetadata $metadata)
     {
         $this->metadata = $metadata;

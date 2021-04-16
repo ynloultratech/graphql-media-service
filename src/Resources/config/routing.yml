@@ -1,5 +1,5 @@
 media_service_get_file:
     path: /file/{id}/{name}
-    defaults:  { _controller: MediaServiceBundle:GetFile:download }
+    defaults:  { _controller: Ynlo\GraphQLMediaServiceBundle\Controller\GetFileController }
     methods:
       - GET

@@ -10,90 +10,62 @@
 
 namespace Ynlo\GraphQLMediaServiceBundle\MediaServer;
 
-use Ynlo\GraphQLMediaServiceBundle\DependencyInjection\Configuration;
-
 class MediaStorageProviderPool
 {
     /**
-     * @var array|MediaStorageProviderInterface[]
+     * @var array|StorageServiceGateway[]
      */
-    protected $providers;
+    protected array $storages = [];
 
     /**
-     * @var array
+     * @param iterable|StorageServiceGateway[] $storages
      */
-    protected $config;
-
-    /**
-     * MediaStorageProviderPool constructor.
-     *
-     * @param array $config media server config
-     */
-    public function __construct($config)
+    public function __construct(iterable $storages)
     {
-        $this->config = $config;
-    }
-
-    /**
-     * Add new storage provider
-     *
-     * @param string                        $alias
-     * @param MediaStorageProviderInterface $storage
-     */
-    public function add($alias, MediaStorageProviderInterface $storage)
-    {
-        $this->providers[$alias] = $storage;
+        foreach ($storages as $storage) {
+            $this->storages[$storage->getName()] = $storage;
+        }
     }
 
     /**
      * Get default provider for given storage id
      *
-     * @param string $storageId get storage provider with settings
-     *                          based on configuration defined un the media_server and storage name
-     *
-     * @return MediaStorageProviderInterface|null
-     */
-    public function getByStorageId($storageId)
-    {
-        $config = $this->config['storage'][$storageId];
-        foreach (Configuration::STORAGE_PROVIDERS as $providerName) {
-            if (isset($config[$providerName])) {
-                $provider = clone $this->get($providerName);
-                $provider->setConfig($config[$providerName]);//inject current settings
-
-                return $provider;
-            }
-        }
-
-        return null;
-    }
-
-    public function getDefaultStorage(): MediaStorageProviderInterface
-    {
-        return $this->getByStorageId($this->config['default_storage']);
-    }
-
-    /**
-     * @param string $alias provider alias
+     * @param string|null $name      get storage provider with settings
+     *                               based on configuration defined un the media_server and storage name
      *
      * @return MediaStorageProviderInterface
      */
-    protected function get($alias)
+    public function get(string $name = null): MediaStorageProviderInterface
     {
-        if ($this->has($alias)) {
-            return $this->providers[$alias];
+        if (!$name) {
+            return $this->getDefault();
         }
 
-        throw new \RuntimeException("Does not exist `$alias` media storage, ensure the service is tagged as `media_service.storage`");
+        if (isset($this->storages[$name])) {
+            return $this->storages[$name]->getProvider();
+        }
+
+        throw new \LogicException(sprintf('There are not a storage provider called %s', $name));
+    }
+
+    public function getDefault(): MediaStorageProviderInterface
+    {
+        foreach ($this->storages as $storage) {
+            if ($storage->isDefault()) {
+                return $storage->getProvider();
+            }
+        }
+
+        throw new \LogicException('There are not a default storage');
     }
 
     /**
-     * @param string $alias provider alias
+     * @param string $name provider alias
      *
      * @return bool
      */
-    protected function has($alias)
+    protected function has($name)
     {
-        return isset($this->providers[$alias]);
+        return isset($this->providers[$name]);
     }
 }

@@ -18,9 +18,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     const STORAGE_LOCAL = 'local';
+    const STORAGE_CUSTOM = 'custom';
 
     const STORAGE_PROVIDERS = [
         self::STORAGE_LOCAL,
+        self::STORAGE_CUSTOM,
     ];
 
     /**
@@ -66,8 +68,6 @@ class Configuration implements ConfigurationInterface
             ->arrayNode(self::STORAGE_LOCAL)
             ->info('Provide local storage capabilities, for public or private files')->children();
 
-        $localStorage->scalarNode('provider')->defaultValue('local');
-
         $localStorage->booleanNode('private')
                      ->defaultFalse()
                      ->info('Mark this storage as private, otherwise is used as public storage');
@@ -105,6 +105,19 @@ class Configuration implements ConfigurationInterface
                      ->min(1)
                      ->max(31536000) //year
                      ->info('Age in seconds of each signature');
+
+
+        //service storage
+        $serviceStorage = $mediaStorage
+            ->arrayNode(self::STORAGE_CUSTOM)
+            ->info('Provide third party storage capabilities')->children();
+
+        $serviceStorage->scalarNode('service')
+                     ->isRequired()
+                     ->info('Name of the service to use');
+
+        $serviceStorage->variableNode('options')
+                       ->info('Third party options to pass to the service');
 
         return $treeBuilder;
     }

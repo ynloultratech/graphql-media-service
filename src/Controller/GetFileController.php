@@ -10,7 +10,7 @@
 
 namespace Ynlo\GraphQLMediaServiceBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,29 +21,35 @@ use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderInterface;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool;
 use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
-class GetFileController extends Controller
+class GetFileController
 {
     protected $extensions;
 
+    protected Registry $registry;
+
+    protected $class;
+
     /**
-     * UploadFileController constructor.
-     *
-     * @param iterable $extensions
+     * @var MediaStorageProviderPool
      */
-    public function __construct(iterable $extensions = [])
+    protected $providerPool;
+
+    public function __construct(Registry $registry, array $config, MediaStorageProviderPool $providerPool, iterable $extensions = [])
     {
         $this->extensions = $extensions;
+        $this->registry = $registry;
+        $this->providerPool = $providerPool;
+        $this->class = $config['class'];
     }
 
-    public function downloadAction(Request $request)
+    public function __invoke(Request $request)
     {
         //api context is not possible here because its a action out of api
-        $class = $this->container->getParameter('media_service_config')['class'];
         $id = $request->get('_route_params')['id'] ?? null;
         $name = $request->get('_route_params')['name'] ?? null;
 
         if ($id && $name) {
-            $media = $this->container->get('doctrine')->getRepository($class)->findOneBy(['id' => $id, 'name' => $name]);
+            $media = $this->registry->getRepository($this->class)->findOneBy(['id' => $id, 'name' => $name]);
             if ($media instanceof FileInterface) {
                 $provider = $this->getStorageProvider($media->getStorage());
 
@@ -78,12 +84,12 @@ class GetFileController extends Controller
     }
 
     /**
-     * @param  string $storageId
+     * @param string $storageId
      *
      * @return MediaStorageProviderInterface
      */
     protected function getStorageProvider($storageId)
     {
-        return $this->get(MediaStorageProviderPool::class)->getByStorageId($storageId);
+        return $this->providerPool->get($storageId);
     }
 }

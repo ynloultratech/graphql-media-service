@@ -16,7 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 
 /**
@@ -25,7 +25,7 @@ use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
 class LocalMediaStorageProvider extends AbstractMediaStorageProvider
 {
     /**
-     * @var Router
+     * @var RouterInterface
      */
     protected $router;
 
@@ -37,10 +37,10 @@ class LocalMediaStorageProvider extends AbstractMediaStorageProvider
     /**
      * LocalMediaStorageProvider constructor.
      *
-     * @param Router $router
-     * @param string $secret
+     * @param RouterInterface $router
+     * @param string          $secret
      */
-    public function __construct(Router $router, $secret)
+    public function __construct(RouterInterface $router, $secret)
     {
         $this->router = $router;
         $this->secret = $secret;
@@ -59,11 +59,11 @@ class LocalMediaStorageProvider extends AbstractMediaStorageProvider
      */
     public function getDownloadUrl(FileInterface $media)
     {
-        if (!$this->config['private']) {
+        if (!($this->config['private'] ?? false)) {
             return rtrim($this->config['base_url'], '/').'/'.$media->getId().'/'.$media->getName();
         }
 
-        $routeName = $this->config['route_name'];
+        $routeName = $this->config['route_name'] ?? null;
         $route = $this->router->getRouteCollection()->get($routeName);
         preg_match_all('/{(\w+)}/', $route->getPath(), $matches);
 
@@ -75,9 +75,15 @@ class LocalMediaStorageProvider extends AbstractMediaStorageProvider
             }
         }
 
-        $url = $this->router->generate($routeName, $params, Router::ABSOLUTE_URL);
+        $url = $this->router->generate($routeName, $params, RouterInterface::ABSOLUTE_URL);
 
-        $expires = \DateTime::createFromFormat('U', time() + $this->config['signature_max_age']);
+        //use domain given in the route
+        //symfony by default use current request domain
+        if ($domain = $route->getDefault('domain')) {
+            $url = preg_replace('/(:\/\/)([^\/])+/', sprintf('$1%s', $domain), $url);
+        }
+
+        $expires = \DateTime::createFromFormat('U', time() + $this->config['signature_max_age'] ?? 3600);
 
         return $this->getUrlSigner($media)->sign($url, $expires);
     }
@@ -152,8 +158,8 @@ class LocalMediaStorageProvider extends AbstractMediaStorageProvider
     {
         return new MD5UrlSigner(
             $media->getStorageMetaValue('salt', $media->getId()),
-            $this->config['expires_parameter'],
-            $this->config['signature_parameter']
+            $this->config['expires_parameter'] ?? 'expires',
+            $this->config['signature_parameter'] ?? 'signature'
         );
     }
 }

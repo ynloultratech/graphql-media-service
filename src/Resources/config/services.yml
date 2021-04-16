@@ -2,10 +2,18 @@ services:
     # makes public all services by default
     _defaults: { public: true }
 
+    Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool:
+        class: Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool
+        arguments:
+            - !tagged media_service.storage_service_gateway
+
     Ynlo\GraphQLMediaServiceBundle\Controller\GetFileController:
         class: Ynlo\GraphQLMediaServiceBundle\Controller\GetFileController
-        public: false
+        public: true
         arguments:
+            - '@doctrine'
+            - '%media_service_config%'
+            - '@Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool'
             - !tagged media_service.extension
 
     Ynlo\GraphQLMediaServiceBundle\MediaServer\FileManager:
@@ -20,11 +28,7 @@ services:
         class: Ynlo\GraphQLMediaServiceBundle\MediaServer\LocalMediaStorageProvider
         arguments: ['@router', '%kernel.secret%']
         tags:
-          - { name: 'media_service.storage', alias: 'local' }
-
-    Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool:
-        class: Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaStorageProviderPool
-        arguments: ['%media_service_config%']
+          - { name: 'media_service.storage' }
 
     Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer:
         class: Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer
