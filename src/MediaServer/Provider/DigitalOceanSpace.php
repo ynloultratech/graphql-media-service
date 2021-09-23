@@ -18,7 +18,7 @@ use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
  *   accessKey: {spaceAccessKey}
  *   secretKey: {spaceSecretKey}
  *   space: space-name // name of the space to use
- *   path: // optional path to use to store files, by default in the space root
+ *   dir_name: // optional directory to use to store files, by default in the space root
  *   signature_age: '15 minutes' // age of the signature for private files (default:  15 minutes)
  */
 class DigitalOceanSpace extends AbstractMediaStorageProvider
@@ -49,7 +49,7 @@ class DigitalOceanSpace extends AbstractMediaStorageProvider
     {
         $tempFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.mt_rand().$media->getName();
         copy($file->getRealPath(), $tempFile);
-        $path = isset($this->config['path']) && $this->config['path'] ? sprintf('%s/', $this->config['path']) : null;
+        $path = isset($this->config['dir_name']) && $this->config['dir_name'] ? sprintf('%s/', $this->config['dir_name']) : null;
         $spaceFile = $this->getSpace()->uploadFile($tempFile, sprintf('%s%s/%s', $path, $media->getId(), $media->getName()));
 
         if ($spaceFile) {
@@ -75,7 +75,7 @@ class DigitalOceanSpace extends AbstractMediaStorageProvider
         if ($file) {
             $file->delete();
             if (empty($this->getSpace()->listFiles($media->getId()))) {
-                $path = isset($this->config['path']) && $this->config['path'] ? sprintf('%s/', $this->config['path']) : null;
+                $path = isset($this->config['dir_name']) && $this->config['dir_name'] ? sprintf('%s/', $this->config['dir_name']) : null;
                 $this->getSpace()->deleteDirectory(sprintf('%s%s', $path, $media->getId()));
             }
         }
