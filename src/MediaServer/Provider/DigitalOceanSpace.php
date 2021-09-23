@@ -17,7 +17,8 @@ use Ynlo\GraphQLMediaServiceBundle\Model\FileInterface;
  *   private: true  // file are marked as private or public
  *   accessKey: {spaceAccessKey}
  *   secretKey: {spaceSecretKey}
- *   space: space-name // name of the space to use
+ *   space: space-name // name of the space to use (must be created on Digital Ocean firstly)
+ *   region: region of the namespace to use, MUST match with created namespace region, default: nyc3
  *   dir_name: // optional directory to use to store files, by default in the space root
  *   signature_age: '15 minutes' // age of the signature for private files (default:  15 minutes)
  */
