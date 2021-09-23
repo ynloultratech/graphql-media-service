@@ -55,8 +55,7 @@ class MediaServiceExtension extends Extension
                 default:
                     $service = $storage[$providerName]['service'];
             }
-            $options = $storage[$providerName]['options'] ?? [];
-
+            $options = $storage[$providerName]['options'] ?? $storage[$providerName];
             $container->register(sprintf('graphql.storage_service_gateway.%s', $name), StorageServiceGateway::class)
                       ->addArgument($name)
                       ->addArgument(new Reference($service))

@@ -21,11 +21,6 @@ class Configuration implements ConfigurationInterface
     const STORAGE_DO_SPACE = 'do_space';
     const STORAGE_CUSTOM = 'custom';
 
-    const STORAGE_PROVIDERS = [
-        self::STORAGE_LOCAL,
-        self::STORAGE_CUSTOM,
-    ];
-
     /**
      * {@inheritdoc}
      */
