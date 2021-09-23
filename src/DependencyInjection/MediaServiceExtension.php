@@ -46,6 +46,12 @@ class MediaServiceExtension extends Extension
                 case Configuration::STORAGE_LOCAL:
                     $service = LocalMediaStorageProvider::class;
                     break;
+                case Configuration::STORAGE_DO_SPACE:
+                    $service = DigitalOceanSpace::class;
+                    if (!class_exists('SpacesAPI\Space')) {
+                        throw new \LogicException('Must add `sociallydev/spaces-api` in your dependencies to use Digital Ocean spaces');
+                    }
+                    break;
                 default:
                     $service = $storage[$providerName]['service'];
             }

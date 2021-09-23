@@ -18,6 +18,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     const STORAGE_LOCAL = 'local';
+    const STORAGE_DO_SPACE = 'do_space';
     const STORAGE_CUSTOM = 'custom';
 
     const STORAGE_PROVIDERS = [
@@ -107,14 +108,44 @@ class Configuration implements ConfigurationInterface
                      ->info('Age in seconds of each signature');
 
 
+        //local storage
+        $localStorage = $mediaStorage
+            ->arrayNode(self::STORAGE_DO_SPACE)
+            ->info('Use Digital Ocean space as file storage')->children();
+
+        $localStorage->booleanNode('private')
+                     ->defaultFalse()
+                     ->info('Mark this storage as private, otherwise is used as public storage');
+
+        $localStorage->scalarNode('dir_name')
+                     ->cannotBeEmpty()
+                     ->info('Directory path to store files');
+
+        $localStorage->scalarNode('accessKey')
+                     ->info('Digital Ocean Space access key');
+
+        $localStorage->scalarNode('secretKey')
+                     ->info('Digital Ocean Space secret key');
+
+        $localStorage->scalarNode('space')
+                     ->info('name of the space to use (must be created on Digital Ocean firstly)');
+
+        $localStorage->scalarNode('region')
+                     ->info('region of the namespace to use, MUST match with created namespace region')
+                     ->defaultValue('nyc3');
+
+        $localStorage->scalarNode('signature_age')
+                     ->info('Age of the signature for private files (ie: 15 minutes, 8 hours, 7 days)')
+                     ->defaultValue('15 minutes');
+
         //service storage
         $serviceStorage = $mediaStorage
             ->arrayNode(self::STORAGE_CUSTOM)
             ->info('Provide third party storage capabilities')->children();
 
         $serviceStorage->scalarNode('service')
-                     ->isRequired()
-                     ->info('Name of the service to use');
+                       ->isRequired()
+                       ->info('Name of the service to use');
 
         $serviceStorage->variableNode('options')
                        ->info('Third party options to pass to the service');
