@@ -26,8 +26,14 @@
     "doctrine/annotations": "^1.5",
     "doctrine/common": "^3.0",
     "ynloultratech/graphql-bundle": "dev-master",
-    "spatie/url-signer": "^1.1",
+    "spatie/url-signer": "^1.2",
     "symfony/mime": "^4.4 || ^5.0"
+  },
+  "require-dev": {
+    "sociallydev/spaces-api": "^3.2"
+  },
+  "suggest": {
+    "sociallydev/spaces-api": "To use DigitalOcean spaces as provider"
   },
   "extra": {
     "branch-alias": {
