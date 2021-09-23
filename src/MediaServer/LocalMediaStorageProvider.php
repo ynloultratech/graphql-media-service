@@ -109,9 +109,15 @@ class LocalMediaStorageProvider extends AbstractMediaStorageProvider
      */
     public function remove(FileInterface $media)
     {
-        $fileSystem = new Filesystem();
+        if (file_exists($this->getFileName($media))) {
+            $fileSystem = new Filesystem();
+            $fileSystem->remove($this->getFileName($media));
 
-        $fileSystem->remove($this->getDirName($media));
+            // is directory empty
+            if (count(scandir($this->getDirName($media))) == 2) {
+                $fileSystem->remove($this->getDirName($media));
+            }
+        }
     }
 
     /**
