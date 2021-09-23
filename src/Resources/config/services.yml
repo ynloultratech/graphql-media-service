@@ -30,6 +30,11 @@ services:
         tags:
           - { name: 'media_service.storage' }
 
+    Ynlo\GraphQLMediaServiceBundle\MediaServer\Provider\DigitalOceanSpace:
+        class: Ynlo\GraphQLMediaServiceBundle\MediaServer\Provider\DigitalOceanSpace
+        tags:
+            - { name: 'media_service.storage' }
+
     Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer:
         class: Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer
         arguments: ['@Ynlo\GraphQLMediaServiceBundle\MediaServer\MediaServerMetadata']

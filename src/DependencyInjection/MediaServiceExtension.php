@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Ynlo\GraphQLMediaServiceBundle\Cache\MediaServerCacheWarmer;
 use Ynlo\GraphQLMediaServiceBundle\Exception\StorageConfigException;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\LocalMediaStorageProvider;
+use Ynlo\GraphQLMediaServiceBundle\MediaServer\Provider\DigitalOceanSpace;
 use Ynlo\GraphQLMediaServiceBundle\MediaServer\StorageServiceGateway;
 
 class MediaServiceExtension extends Extension
@@ -56,6 +57,10 @@ class MediaServiceExtension extends Extension
                       ->addArgument($options)
                       ->addArgument($name === $config['default_storage'])
                       ->addTag('media_service.storage_service_gateway');
+        }
+
+        if (!class_exists('SpacesAPI\Space')) {
+            $container->removeDefinition(DigitalOceanSpace::class);
         }
 
         //in production does not clear cache using request events

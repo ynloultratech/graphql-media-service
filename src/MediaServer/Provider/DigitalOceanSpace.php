@@ -61,6 +61,7 @@ class DigitalOceanSpace extends AbstractMediaStorageProvider
 
             $media->setStorageMeta([
                 'filename' => $spaceFile->filename,
+                'url' => $spaceFile->getURL(),
             ]);
         }
     }
@@ -86,6 +87,10 @@ class DigitalOceanSpace extends AbstractMediaStorageProvider
 
         if ($file) {
             if ($file->isPublic()) {
+                if ($url = $media->getStorageMetaValue('url')) {
+                    return $url;
+                }
+
                 return $file->getURL();
             }
 
