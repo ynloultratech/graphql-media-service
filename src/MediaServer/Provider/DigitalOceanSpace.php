@@ -116,7 +116,11 @@ class DigitalOceanSpace extends AbstractMediaStorageProvider
         $fileName = $media->getStorageMetaValue('filename') ?? null;
 
         if ($fileName) {
-            return $this->getSpace()->file($media->getStorageMetaValue('filename'));
+            try {
+                return $this->getSpace()->file($media->getStorageMetaValue('filename'));
+            } catch (FileDoesntExistException $exception) {
+                return null;
+            }
         }
 
         return null;
